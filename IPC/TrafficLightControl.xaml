@@ -1,0 +1,22 @@
+<UserControl x:Class="IPC.TrafficLightControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="24" d:DesignWidth="24">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="LightOff" Color="Gray"/>
+        <SolidColorBrush x:Key="RedOn" Color="#FFDD3333"/>
+        <SolidColorBrush x:Key="YellowOn" Color="#FFEECC33"/>
+        <SolidColorBrush x:Key="GreenOn" Color="#FF33CC33"/>
+    </UserControl.Resources>
+
+    <Grid Width="24" Height="24">
+        <Ellipse x:Name="LightCircle"
+                 Width="12" Height="12"
+                 HorizontalAlignment="Center" VerticalAlignment="Center"
+                 Fill="{StaticResource LightOff}"
+                 Stroke="Black" StrokeThickness="0.5"/>
+    </Grid>
+</UserControl>

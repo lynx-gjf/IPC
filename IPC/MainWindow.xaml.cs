@@ -56,7 +56,7 @@ namespace IPC
         /// <summary>
         /// 打开关闭串口
         /// </summary>
-        private void btnOpenCloseCom_Click(object sender, RoutedEventArgs e)
+        private void BtnOpenCloseCom_Click(object sender, RoutedEventArgs e)
         {
             if (_spManager.IsOpen)
             {
@@ -73,13 +73,14 @@ namespace IPC
             }
             else
             {
-                if (comboBoxCOM.SelectedItem == null)
+                // 替换原有的获取 portName 代码，添加 null 检查和转换
+                string? portName = comboBoxCOM.SelectedItem as string;
+                if (string.IsNullOrEmpty(portName))
                 {
                     MessageBox.Show("请选择串口");
                     return;
                 }
 
-                string portName = comboBoxCOM.SelectedItem.ToString();
                 int baud = 1000000;
 
                 switch (comboBoxBaudRate.SelectedIndex)
@@ -134,7 +135,7 @@ namespace IPC
         /// <summary>
         /// 清空串口接收数据
         /// </summary>
-        private void btnClearRecv_Click(object sender, RoutedEventArgs e)
+        private void BtnClearRecv_Click(object sender, RoutedEventArgs e)
         {
             _spManager.ClearBuffer();
             textBlockRecv.Text = string.Empty;
@@ -143,7 +144,7 @@ namespace IPC
         /// <summary>
         /// 串口端口选择（下拉时刷新列表）
         /// </summary>
-        private void comboBoxCOM_Drop(object sender, DragEventArgs e)
+        private void ComboBoxCOM_Drop(object sender, DragEventArgs e)
         {
             string[] ports = _spManager.GetPortNames();
             comboBoxCOM.ItemsSource = ports;
@@ -155,7 +156,7 @@ namespace IPC
         /// 发送按钮示例：读取 textBoxSend 的文本并发送（不带换行）
         /// 在 XAML 中请确保有 textBoxSend 与 btnSend，并把 btnSend 的 Click 绑定到此方法
         /// </summary>
-        private void btnSend_Click(object sender, RoutedEventArgs e)
+        private void BtnSend_Click(object sender, RoutedEventArgs e)
         {
             if (!_spManager.IsOpen)
             {

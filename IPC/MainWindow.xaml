@@ -23,7 +23,7 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label Margin="3" Height="25" Width="50">端口号</Label>
-                                <ComboBox x:Name="comboBoxCOM" Margin="3" Height="20" Width="130" DragDrop.Drop="comboBoxCOM_Drop"/>
+                                <ComboBox x:Name="comboBoxCOM" Margin="3" Height="20" Width="130" DragDrop.Drop="ComboBoxCOM_Drop"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label Margin="3" Height="25" Width="50">波特率</Label>
@@ -71,12 +71,12 @@
                                 </ComboBox>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button x:Name="btnOpenCloseCom" Margin="3" Width="80" Height="25" Click="btnOpenCloseCom_Click">打开串口</Button>
-                                <Button x:Name="btnClearRecv" Margin="3" Width="80" Height="25" Click="btnClearRecv_Click">清空接收</Button>
+                                <Button x:Name="btnOpenCloseCom" Margin="3" Width="80" Height="25" Click="BtnOpenCloseCom_Click">打开串口</Button>
+                                <Button x:Name="btnClearRecv" Margin="3" Width="80" Height="25" Click="BtnClearRecv_Click">清空接收</Button>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="61">
                                 <TextBox x:Name="textBoxSend" Width="89" Margin="3" VerticalAlignment="Center" />
-                                <Button x:Name="btnSend" Margin="3" Width="80" Height="25" Click="btnSend_Click">发送</Button>
+                                <Button x:Name="btnSend" Margin="3" Width="80" Height="25" Click="BtnSend_Click">发送</Button>
                             </StackPanel>
 
                             <StackPanel Height="99"/>

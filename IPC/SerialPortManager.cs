@@ -294,6 +294,26 @@ namespace IPC
             }
         }
 
+        /// <summary>
+        /// 发送文本字符串（按当前编码发送）。当 appendNewLine 为 true 时，会在尾部追加串口的 NewLine 字符串。
+        /// 例：SendString("Hello"), SendString("OK", true)
+        /// 注意：不会对文本进行分帧检查，直接以字节流发送
+        /// </summary>
+        public void SendString(string text, bool appendNewLine = false)
+        {
+            if (text is null) throw new ArgumentNullException(nameof(text));
+            if (!_serialPort.IsOpen) throw new InvalidOperationException("串口未打开");
+
+            string payload = appendNewLine ? text + _serialPort.NewLine : text;
+            Encoding enc = _serialPort.Encoding ?? this.Encoding;
+            byte[] data = enc.GetBytes(payload);
+
+            lock (_writeLock)
+            {
+                _serialPort.Write(data, 0, data.Length);
+            }
+        }
+
         public void Dispose()
         {
             try

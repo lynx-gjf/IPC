@@ -182,5 +182,36 @@ namespace IPC
                 MessageBox.Show("发送失败: " + ex.Message);
             }
         }
+
+        /// <summary>
+        /// 新增：发送字符串（使用 textBoxSend2 的内容），按当前编码发送，不追加换行
+        /// 绑定到 XAML 中 btnSend2 的 Click 事件（已存在）
+        /// </summary>
+        private void btnSend_Click2(object sender, RoutedEventArgs e)
+        {
+            if (!_spManager.IsOpen)
+            {
+                MessageBox.Show("请先打开串口");
+                return;
+            }
+
+            string toSend = textBoxSend2?.Text ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(toSend))
+            {
+                MessageBox.Show("发送内容为空");
+                return;
+            }
+
+            try
+            {
+                // 调用 SerialPortManager 的 SendString 方法发送文本（不追加 NewLine）
+                _spManager.SendString(toSend, false);
+                Debug.WriteLine("已发送(STR): " + toSend);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("发送失败: " + ex.Message);
+            }
+        }
     }
 }

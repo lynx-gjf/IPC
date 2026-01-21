@@ -79,7 +79,19 @@
                                 <Button x:Name="btnSend" Margin="3" Width="80" Height="25" Click="BtnSend_Click">发送</Button>
                             </StackPanel>
 
-                            <StackPanel Height="99"/>
+
+                            <StackPanel Height="3" RenderTransformOrigin="0.5,0.5">
+                                <StackPanel.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </StackPanel.RenderTransform>
+                            </StackPanel>
+                            <TextBox x:Name="textBoxSend2" Width="88" />
+                            <Button x:Name="btnSend2" Margin="3" Width="80" Height="25" Click="btnSend_Click2">发送</Button>
                         </StackPanel>
 
                     </GroupBox>

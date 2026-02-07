@@ -32,10 +32,23 @@ namespace IPC
         // 来自 SerialPortManager 的文本片段（例如包含 $$ADC[...]ADC$$ 的片段）
         private void SpManager_TextReceived(string fullText)
         {
-            // 在 UI 线程更新控件
+            // 在 UI 线程追加并换行显示最新接收的一条信息，保持历史内容
             this.Dispatcher.Invoke(new Action(() =>
             {
-                textBlockRecv.Text = fullText;  // 显示接收到的文本内容（最新片段）
+                if (string.IsNullOrEmpty(textBlockRecv.Text))
+                    textBlockRecv.Text = fullText;
+                else
+                    textBlockRecv.Text += Environment.NewLine + fullText;
+
+                // 确保最新内容可见
+                try
+                {
+                    textBlockRecv.BringIntoView();
+                }
+                catch
+                {
+                    // 若发生异常（极少见），忽略，不影响显示
+                }
             }));
         }
 

@@ -96,12 +96,13 @@
 
                     </GroupBox>
                     <GroupBox Header="接收数据" MinWidth="590" MaxWidth="1000" Width="515">
-                        <ScrollViewer>
-                            <ScrollViewer.Content>
-                                <TextBlock x:Name="textBlockRecv" MinWidth="300"></TextBlock>
-                            </ScrollViewer.Content>
-                        </ScrollViewer>
-
+                        <!-- 使用只读 TextBox 作为接收显示：支持换行、自动滚动 -->
+                        <TextBox x:Name="textBoxRecv"
+                                 MinWidth="300"
+                                 IsReadOnly="True"
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto"/>
                     </GroupBox>
                 </StackPanel>
             </TabItem>

@@ -32,10 +32,12 @@ namespace IPC
         // 来自 SerialPortManager 的文本片段（例如包含 $$ADC[...]ADC$$ 的片段）
         private void SpManager_TextReceived(string fullText)
         {
-            // 在 UI 线程更新控件
+            // 在 UI 线程追加并换行显示最新接收的一条信息，保持历史内容
             this.Dispatcher.Invoke(new Action(() =>
             {
-                textBlockRecv.Text = fullText;  // 显示接收到的文本内容（最新片段）
+                // 使用 TextBox.AppendText 保留历史并避免完整替换 Text 属性
+                textBoxRecv.AppendText(fullText + Environment.NewLine);
+                textBoxRecv.ScrollToEnd();
             }));
         }
 
@@ -73,7 +75,6 @@ namespace IPC
             }
             else
             {
-                // 替换原有的获取 portName 代码，添加 null 检查和转换
                 string? portName = comboBoxCOM.SelectedItem as string;
                 if (string.IsNullOrEmpty(portName))
                 {
@@ -138,7 +139,7 @@ namespace IPC
         private void BtnClearRecv_Click(object sender, RoutedEventArgs e)
         {
             _spManager.ClearBuffer();
-            textBlockRecv.Text = string.Empty;
+            textBoxRecv.Clear();
         }
 
         /// <summary>
@@ -163,8 +164,8 @@ namespace IPC
                 MessageBox.Show("请先打开串口");
                 return;
             }
-
-            string toSend = textBoxSend?.Text ?? string.Empty;
+            // 修正：不应将 TextBox 与字符串相加，应操作其 Text 属性
+            string toSend = (textBoxSend?.Text ?? string.Empty) + "\r\n";
             if (string.IsNullOrWhiteSpace(toSend))
             {
                 MessageBox.Show("发送内容为空");

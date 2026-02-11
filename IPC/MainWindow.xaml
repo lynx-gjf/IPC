@@ -70,6 +70,14 @@
                                     <ComboBoxItem>XON/XOFF</ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Margin="3" Height="25" Width="50">编码</Label>
+                                <ComboBox x:Name="comboBoxEncoding" Margin="3" Height="20" Width="130" SelectedIndex="0" SelectionChanged="ComboBoxEncoding_SelectionChanged">
+                                    <ComboBoxItem>UTF-8</ComboBoxItem>
+                                    <ComboBoxItem>ASCII</ComboBoxItem>
+                                    <ComboBoxItem>GB2312</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                 <Button x:Name="btnOpenCloseCom" Margin="3" Width="80" Height="25" Click="BtnOpenCloseCom_Click">打开串口</Button>
                                 <Button x:Name="btnClearRecv" Margin="3" Width="80" Height="25" Click="BtnClearRecv_Click">清空接收</Button>
@@ -77,6 +85,9 @@
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="61">
                                 <TextBox x:Name="textBoxSend" Width="89" Margin="3" VerticalAlignment="Center" />
                                 <Button x:Name="btnSend" Margin="3" Width="80" Height="25" Click="BtnSend_Click">发送</Button>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <CheckBox x:Name="checkBoxAddCRLF" Margin="3" VerticalAlignment="Center" IsChecked="False">自动添加回车换行</CheckBox>
                             </StackPanel>
 
 
@@ -97,11 +108,8 @@
                     </GroupBox>
                     <GroupBox Header="接收数据" MinWidth="590" MaxWidth="1000" Width="515">
                         <ScrollViewer>
-                            <ScrollViewer.Content>
-                                <TextBlock x:Name="textBlockRecv" MinWidth="300"></TextBlock>
-                            </ScrollViewer.Content>
+                            <TextBox x:Name="textBoxRecv" MinWidth="300" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"></TextBox>
                         </ScrollViewer>
-
                     </GroupBox>
                 </StackPanel>
             </TabItem>
@@ -136,5 +144,3 @@
         </TabControl>
     </Grid>
 </Window>
-
-

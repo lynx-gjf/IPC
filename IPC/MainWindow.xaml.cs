@@ -16,13 +16,21 @@ namespace IPC
         {
             InitializeComponent();
 
+            // 注册 CodePages 提供器,以便支持 GBK/GB2312 等编码（仅需一次）
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             // 获取所有可用串口端口，并添加到comboBoxCOM
             RefreshPortList();
 
             // 订阅数据接收事件（非 UI 线程触发）
-            // 原来直接订阅 DataReceived 并在这里解析，现在把解析移到 SerialPortManager：
-            _spManager.TextReceived += SpManager_TextReceived;
-            _spManager.AdcArrayReceived += SpManager_AdcArrayReceived;
+            _spManager.DataReceived += SpManager_DataReceived;
+
+            // 初始化编码选择（默认 UTF-8）
+            if (comboBoxEncoding != null)
+            {
+                comboBoxEncoding.SelectedIndex = 0;
+                UpdateEncodingFromSelection();
+            }
         }
 
         /// <summary>
@@ -30,25 +38,49 @@ namespace IPC
         /// </summary>
         private void RefreshPortList()
         {
-            // 在 UI 线程更新控件
+            string[] ports = _spManager.GetPortNames();
+            comboBoxCOM.ItemsSource = ports;
+            if (ports.Length > 0)
+                comboBoxCOM.SelectedIndex = 0;
+        }
+
+        /// <summary>
+        /// 来自 SerialPortManager 的数据接收事件
+        /// </summary>
+        private void SpManager_DataReceived(string data)
+        {
             this.Dispatcher.Invoke(new Action(() =>
             {
-                textBlockRecv.Text = fullText;  // 显示接收到的文本内容（最新片段）
+                textBoxRecv.AppendText(data);
+                textBoxRecv.ScrollToEnd();
             }));
         }
 
-        // 来自 SerialPortManager 的 ADC 数组解析结果
-        private void SpManager_AdcArrayReceived(double[] values)
+        /// <summary>
+        /// 根据选择更新编码
+        /// </summary>
+        private void UpdateEncodingFromSelection()
         {
-            // 在 UI 线程或后台都可以处理；这里仅示例输出第一个值到调试窗口
-            this.Dispatcher.Invoke(new Action(() =>
+            if (comboBoxEncoding == null) return;
+
+            Encoding chosen = comboBoxEncoding.SelectedIndex switch
             {
-                if (values != null && values.Length > 0)
-                {
-                    double adc1 = values[0];
-                    Debug.WriteLine($"adc1 = {adc1}");
-                }
-            }));
+                0 => Encoding.UTF8,
+                1 => Encoding.ASCII,
+                2 => Encoding.GetEncoding("GB2312"),
+                _ => Encoding.UTF8
+            };
+
+            _spManager.Encoding = chosen;
+            Debug.WriteLine($"编码已切换为: {chosen.EncodingName}");
+        }
+
+        /// <summary>
+        /// 编码选择改变事件
+        /// </summary>
+        private void ComboBoxEncoding_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            UpdateEncodingFromSelection();
         }
 
         /// <summary>
@@ -72,7 +104,6 @@ namespace IPC
             }
             else
             {
-                // 替换原有的获取 portName 代码，添加 null 检查和转换
                 string? portName = comboBoxCOM.SelectedItem as string;
                 if (string.IsNullOrEmpty(portName))
                 {
@@ -92,6 +123,9 @@ namespace IPC
 
                 try
                 {
+                    // 在打开前确保使用当前选择的编码
+                    UpdateEncodingFromSelection();
+
                     _spManager.Open(portName, baud);
                     btnOpenCloseCom.Content = "关闭串口";
                     Debug.WriteLine($"打开串口成功: {portName}, 波特率: {baud}");
@@ -117,7 +151,7 @@ namespace IPC
         private void BtnClearRecv_Click(object sender, RoutedEventArgs e)
         {
             _spManager.ClearBuffer();
-            textBlockRecv.Text = string.Empty;
+            textBoxRecv.Clear();
         }
 
         /// <summary>
@@ -129,8 +163,7 @@ namespace IPC
         }
 
         /// <summary>
-        /// 发送按钮示例：读取 textBoxSend 的文本并发送（不带换行）
-        /// 在 XAML 中请确保有 textBoxSend 与 btnSend，并把 btnSend 的 Click 绑定到此方法
+        /// 发送按钮1 - 发送字符串
         /// </summary>
         private void BtnSend_Click(object sender, RoutedEventArgs e)
         {
@@ -147,11 +180,16 @@ namespace IPC
                 return;
             }
 
+            // 如果勾选了自动添加回车换行,则添加\r\n
+            if (checkBoxAddCRLF?.IsChecked == true)
+            {
+                toSend += "\r\n";
+            }
+
             try
             {
-                // 使用 SendHex 发送十六进制字符串（SerialPortManager 会验证是否正好为 8 字节）
-                _spManager.SendHex(toSend);
-                Debug.WriteLine("已发送(HEX): " + toSend);
+                _spManager.SendString(toSend);
+                Debug.WriteLine("已发送: " + toSend);
             }
             catch (Exception ex)
             {
@@ -160,8 +198,7 @@ namespace IPC
         }
 
         /// <summary>
-        /// 新增：发送字符串（使用 textBoxSend2 的内容），按当前编码发送，不追加换行
-        /// 绑定到 XAML 中 btnSend2 的 Click 事件（已存在）
+        /// 发送按钮2 - 发送字符串
         /// </summary>
         private void btnSend_Click2(object sender, RoutedEventArgs e)
         {
@@ -178,11 +215,16 @@ namespace IPC
                 return;
             }
 
+            // 如果勾选了自动添加回车换行,则添加\r\n
+            if (checkBoxAddCRLF?.IsChecked == true)
+            {
+                toSend += "\r\n";
+            }
+
             try
             {
-                // 调用 SerialPortManager 的 SendString 方法发送文本（不追加 NewLine）
-                _spManager.SendString(toSend, false);
-                Debug.WriteLine("已发送(STR): " + toSend);
+                _spManager.SendString(toSend);
+                Debug.WriteLine("已发送: " + toSend);
             }
             catch (Exception ex)
             {

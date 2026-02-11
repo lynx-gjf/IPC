@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Text;
 using System.Windows;
-using System.IO.Ports;
 
 namespace IPC
 {
@@ -18,10 +17,7 @@ namespace IPC
             InitializeComponent();
 
             // 获取所有可用串口端口，并添加到comboBoxCOM
-            string[] ports = _spManager.GetPortNames();
-            comboBoxCOM.ItemsSource = ports;
-            if (ports.Length > 0)
-                comboBoxCOM.SelectedIndex = 0;  // 默认选择索引
+            RefreshPortList();
 
             // 订阅数据接收事件（非 UI 线程触发）
             // 原来直接订阅 DataReceived 并在这里解析，现在把解析移到 SerialPortManager：
@@ -29,8 +25,10 @@ namespace IPC
             _spManager.AdcArrayReceived += SpManager_AdcArrayReceived;
         }
 
-        // 来自 SerialPortManager 的文本片段（例如包含 $$ADC[...]ADC$$ 的片段）
-        private void SpManager_TextReceived(string fullText)
+        /// <summary>
+        /// 刷新串口列表
+        /// </summary>
+        private void RefreshPortList()
         {
             // 在 UI 线程更新控件
             this.Dispatcher.Invoke(new Action(() =>
@@ -54,7 +52,7 @@ namespace IPC
         }
 
         /// <summary>
-        /// 打开关闭串口
+        /// 打开/关闭串口
         /// </summary>
         private void BtnOpenCloseCom_Click(object sender, RoutedEventArgs e)
         {
@@ -62,8 +60,9 @@ namespace IPC
             {
                 _spManager.Close();
                 btnOpenCloseCom.Content = "打开串口";
-                Console.WriteLine("关闭串口成功");
                 Debug.WriteLine("关闭串口成功");
+
+                // 启用配置控件
                 comboBoxBaudRate.IsEnabled = true;
                 comboBoxCOM.IsEnabled = true;
                 comboBoxDataBit.IsEnabled = true;
@@ -77,47 +76,27 @@ namespace IPC
                 string? portName = comboBoxCOM.SelectedItem as string;
                 if (string.IsNullOrEmpty(portName))
                 {
-                    MessageBox.Show("请选择串口");
+                    MessageBox.Show("请选择串口", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                int baud = 1000000;
-
-                switch (comboBoxBaudRate.SelectedIndex)
+                int baud = comboBoxBaudRate.SelectedIndex switch
                 {
-                    case 0:
-                        Console.WriteLine("baudrate: 9600");
-                        baud = 9600;
-                        break;
-                    case 1:
-                        baud = 19200;
-                        Console.WriteLine("baudrate: 19200");
-                        break;
-                    case 2:
-                        baud = 38400;
-                        Console.WriteLine("baudrate: 38400");
-                        break;
-                    case 3:
-                        Console.WriteLine("baudrate: 115200");
-                        baud = 115200;
-                        break;
-                    case 4:
-                        Console.WriteLine("baudrate: 1000000");
-                        baud = 1000000;
-                        break;
-                    default:
-                        Console.WriteLine("default baudrate!");
-                        baud = 9600;
-                        break;
-                }
+                    0 => 9600,
+                    1 => 19200,
+                    2 => 38400,
+                    3 => 115200,
+                    4 => 1000000,
+                    _ => 9600
+                };
 
                 try
                 {
                     _spManager.Open(portName, baud);
                     btnOpenCloseCom.Content = "关闭串口";
-                    Console.WriteLine("打开串口成功");
-                    Debug.WriteLine("打开串口成功");
+                    Debug.WriteLine($"打开串口成功: {portName}, 波特率: {baud}");
 
+                    // 禁用配置控件
                     comboBoxBaudRate.IsEnabled = false;
                     comboBoxCOM.IsEnabled = false;
                     comboBoxDataBit.IsEnabled = false;
@@ -127,13 +106,13 @@ namespace IPC
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    MessageBox.Show($"打开串口失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
 
         /// <summary>
-        /// 清空串口接收数据
+        /// 清空接收区
         /// </summary>
         private void BtnClearRecv_Click(object sender, RoutedEventArgs e)
         {
@@ -142,14 +121,11 @@ namespace IPC
         }
 
         /// <summary>
-        /// 串口端口选择（下拉时刷新列表）
+        /// 串口下拉框展开时刷新列表
         /// </summary>
-        private void ComboBoxCOM_Drop(object sender, DragEventArgs e)
+        private void ComboBoxCOM_DropDownOpened(object sender, EventArgs e)
         {
-            string[] ports = _spManager.GetPortNames();
-            comboBoxCOM.ItemsSource = ports;
-            if (ports.Length > 0)
-                comboBoxCOM.SelectedIndex = 0;
+            RefreshPortList();
         }
 
         /// <summary>
@@ -160,14 +136,14 @@ namespace IPC
         {
             if (!_spManager.IsOpen)
             {
-                MessageBox.Show("请先打开串口");
+                MessageBox.Show("请先打开串口", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             string toSend = textBoxSend?.Text ?? string.Empty;
             if (string.IsNullOrWhiteSpace(toSend))
             {
-                MessageBox.Show("发送内容为空");
+                MessageBox.Show("发送内容为空", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -179,7 +155,7 @@ namespace IPC
             }
             catch (Exception ex)
             {
-                MessageBox.Show("发送失败: " + ex.Message);
+                MessageBox.Show($"发送失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -191,14 +167,14 @@ namespace IPC
         {
             if (!_spManager.IsOpen)
             {
-                MessageBox.Show("请先打开串口");
+                MessageBox.Show("请先打开串口", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             string toSend = textBoxSend2?.Text ?? string.Empty;
             if (string.IsNullOrWhiteSpace(toSend))
             {
-                MessageBox.Show("发送内容为空");
+                MessageBox.Show("发送内容为空", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -210,7 +186,7 @@ namespace IPC
             }
             catch (Exception ex)
             {
-                MessageBox.Show("发送失败: " + ex.Message);
+                MessageBox.Show($"发送失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

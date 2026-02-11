@@ -23,7 +23,7 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label Margin="3" Height="25" Width="50">端口号</Label>
-                                <ComboBox x:Name="comboBoxCOM" Margin="3" Height="20" Width="130" DragDrop.Drop="ComboBoxCOM_Drop"/>
+                                <ComboBox x:Name="comboBoxCOM" Margin="3" Height="20" Width="130"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label Margin="3" Height="25" Width="50">波特率</Label>

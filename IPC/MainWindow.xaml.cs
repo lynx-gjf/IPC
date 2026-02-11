@@ -17,9 +17,6 @@ namespace IPC
         {
             InitializeComponent();
 
-            // 注册 CodePages 提供器，以便支持 GBK/GB2312 等编码（仅需一次）
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
             // 获取所有可用串口端口，并添加到comboBoxCOM
             string[] ports = _spManager.GetPortNames();
             comboBoxCOM.ItemsSource = ports;
@@ -27,44 +24,25 @@ namespace IPC
                 comboBoxCOM.SelectedIndex = 0;  // 默认选择索引
 
             // 订阅数据接收事件（非 UI 线程触发）
+            // 原来直接订阅 DataReceived 并在这里解析，现在把解析移到 SerialPortManager：
             _spManager.TextReceived += SpManager_TextReceived;
             _spManager.AdcArrayReceived += SpManager_AdcArrayReceived;
-            _spManager.DataReceived += SpManager_DataReceived;
-
-            // 初始化编码选择（默认 UTF-8）
-            comboBoxEncoding.SelectedIndex = 0;
-            UpdateEncodingFromSelection();
         }
 
         // 来自 SerialPortManager 的文本片段（例如包含 $$ADC[...]ADC$$ 的片段）
         private void SpManager_TextReceived(string fullText)
         {
-            // 如果当前为 Hex 模式则不显示文本片段
-            if (IsHexMode()) return;
-
+            // 在 UI 线程更新控件
             this.Dispatcher.Invoke(new Action(() =>
             {
-                textBoxRecv.AppendText(fullText + Environment.NewLine);
-                textBoxRecv.ScrollToEnd();
-            }));
-        }
-
-        // 来自 SerialPortManager 的 8 字节帧十六进制字符串（例如 "AA BB CC ..."）
-        private void SpManager_DataReceived(string hex)
-        {
-            // 仅在 Hex 模式下显示十六进制帧
-            if (!IsHexMode()) return;
-
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                textBoxRecv.AppendText(hex + Environment.NewLine);
-                textBoxRecv.ScrollToEnd();
+                textBlockRecv.Text = fullText;  // 显示接收到的文本内容（最新片段）
             }));
         }
 
         // 来自 SerialPortManager 的 ADC 数组解析结果
         private void SpManager_AdcArrayReceived(double[] values)
         {
+            // 在 UI 线程或后台都可以处理；这里仅示例输出第一个值到调试窗口
             this.Dispatcher.Invoke(new Action(() =>
             {
                 if (values != null && values.Length > 0)
@@ -73,44 +51,6 @@ namespace IPC
                     Debug.WriteLine($"adc1 = {adc1}");
                 }
             }));
-        }
-
-        private bool IsHexMode()
-        {
-            return comboBoxEncoding?.SelectedIndex == 3;
-        }
-
-        private void UpdateEncodingFromSelection()
-        {
-            if (comboBoxEncoding == null) return;
-
-            Encoding chosen = Encoding.UTF8;
-            switch (comboBoxEncoding.SelectedIndex)
-            {
-                case 0: // UTF-8
-                    chosen = Encoding.UTF8;
-                    break;
-                case 1: // ASCII
-                    chosen = Encoding.ASCII;
-                    break;
-                case 2: // GBK
-                    chosen = Encoding.GetEncoding("GB2312"); // 或使用 codepage 936
-                    break;
-                case 3: // Hex 模式：编码仍保持 UTF-8 以避免异常，但显示以 Hex 为准
-                    chosen = Encoding.UTF8;
-                    break;
-                default:
-                    chosen = Encoding.UTF8;
-                    break;
-            }
-
-            // 更新 SerialPortManager（会在串口已打开时同步到 SerialPort）
-            _spManager.Encoding = chosen;
-        }
-
-        private void ComboBoxEncoding_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-            UpdateEncodingFromSelection();
         }
 
         /// <summary>
@@ -133,6 +73,7 @@ namespace IPC
             }
             else
             {
+                // 替换原有的获取 portName 代码，添加 null 检查和转换
                 string? portName = comboBoxCOM.SelectedItem as string;
                 if (string.IsNullOrEmpty(portName))
                 {
@@ -172,9 +113,6 @@ namespace IPC
 
                 try
                 {
-                    // 在打开前确保 SerialPortManager 使用当前选择的编码
-                    UpdateEncodingFromSelection();
-
                     _spManager.Open(portName, baud);
                     btnOpenCloseCom.Content = "关闭串口";
                     Console.WriteLine("打开串口成功");
@@ -200,7 +138,7 @@ namespace IPC
         private void BtnClearRecv_Click(object sender, RoutedEventArgs e)
         {
             _spManager.ClearBuffer();
-            textBoxRecv.Clear();
+            textBlockRecv.Text = string.Empty;
         }
 
         /// <summary>
@@ -214,6 +152,10 @@ namespace IPC
                 comboBoxCOM.SelectedIndex = 0;
         }
 
+        /// <summary>
+        /// 发送按钮示例：读取 textBoxSend 的文本并发送（不带换行）
+        /// 在 XAML 中请确保有 textBoxSend 与 btnSend，并把 btnSend 的 Click 绑定到此方法
+        /// </summary>
         private void BtnSend_Click(object sender, RoutedEventArgs e)
         {
             if (!_spManager.IsOpen)
@@ -221,7 +163,8 @@ namespace IPC
                 MessageBox.Show("请先打开串口");
                 return;
             }
-            string toSend = (textBoxSend?.Text ?? string.Empty) + "\r\n";
+
+            string toSend = textBoxSend?.Text ?? string.Empty;
             if (string.IsNullOrWhiteSpace(toSend))
             {
                 MessageBox.Show("发送内容为空");
@@ -230,6 +173,7 @@ namespace IPC
 
             try
             {
+                // 使用 SendHex 发送十六进制字符串（SerialPortManager 会验证是否正好为 8 字节）
                 _spManager.SendHex(toSend);
                 Debug.WriteLine("已发送(HEX): " + toSend);
             }
@@ -239,6 +183,10 @@ namespace IPC
             }
         }
 
+        /// <summary>
+        /// 新增：发送字符串（使用 textBoxSend2 的内容），按当前编码发送，不追加换行
+        /// 绑定到 XAML 中 btnSend2 的 Click 事件（已存在）
+        /// </summary>
         private void btnSend_Click2(object sender, RoutedEventArgs e)
         {
             if (!_spManager.IsOpen)
@@ -256,6 +204,7 @@ namespace IPC
 
             try
             {
+                // 调用 SerialPortManager 的 SendString 方法发送文本（不追加 NewLine）
                 _spManager.SendString(toSend, false);
                 Debug.WriteLine("已发送(STR): " + toSend);
             }

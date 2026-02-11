@@ -70,20 +70,6 @@
                                     <ComboBoxItem>XON/XOFF</ComboBoxItem>
                                 </ComboBox>
                             </StackPanel>
-
-                            <!-- 新增：编码/显示模式下拉 -->
-                            <StackPanel Orientation="Horizontal">
-                                <Label Margin="3" Height="25" Width="50">显示模式</Label>
-                                <ComboBox x:Name="comboBoxEncoding" Margin="3" Height="20" Width="130"
-                                          SelectedIndex="0"
-                                          SelectionChanged="ComboBoxEncoding_SelectionChanged">
-                                    <ComboBoxItem>UTF-8</ComboBoxItem>
-                                    <ComboBoxItem>ASCII</ComboBoxItem>
-                                    <ComboBoxItem>GBK</ComboBoxItem>
-                                    <ComboBoxItem>Hex</ComboBoxItem>
-                                </ComboBox>
-                            </StackPanel>
-
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                 <Button x:Name="btnOpenCloseCom" Margin="3" Width="80" Height="25" Click="BtnOpenCloseCom_Click">打开串口</Button>
                                 <Button x:Name="btnClearRecv" Margin="3" Width="80" Height="25" Click="BtnClearRecv_Click">清空接收</Button>
@@ -110,13 +96,12 @@
 
                     </GroupBox>
                     <GroupBox Header="接收数据" MinWidth="590" MaxWidth="1000" Width="515">
-                        <!-- 使用只读 TextBox 作为接收显示：支持换行、自动滚动 -->
-                        <TextBox x:Name="textBoxRecv"
-                                 MinWidth="300"
-                                 IsReadOnly="True"
-                                 TextWrapping="Wrap"
-                                 AcceptsReturn="True"
-                                 VerticalScrollBarVisibility="Auto"/>
+                        <ScrollViewer>
+                            <ScrollViewer.Content>
+                                <TextBlock x:Name="textBlockRecv" MinWidth="300"></TextBlock>
+                            </ScrollViewer.Content>
+                        </ScrollViewer>
+
                     </GroupBox>
                 </StackPanel>
             </TabItem>

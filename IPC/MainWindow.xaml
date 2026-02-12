@@ -5,22 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:IPC"
         mc:Ignorable="d"
-        Title="上位机" Height="450" Width="800">
+        Title="上位机" Height="742" Width="1075">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="7*"/>
-            <ColumnDefinition Width="153*"/>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition Width="432*"/>
+            <ColumnDefinition Width="643*"/>
         </Grid.ColumnDefinitions>
-        <TabControl Grid.ColumnSpan="2">
+        <TabControl Grid.ColumnSpan="4">
             <TabItem>
                 <TabItem.Header>
                     <StackPanel>
                         <Label>串口设置</Label>
                     </StackPanel>
                 </TabItem.Header>
-                <StackPanel Orientation="Horizontal">
-                    <GroupBox Header="串口" Width="200">
-                        <StackPanel>
+                <StackPanel Orientation="Horizontal" Height="729">
+                    <GroupBox Header="串口" Width="206" Height="626" VerticalAlignment="Top">
+                        <StackPanel Height="630" RenderTransformOrigin="0.512,0.800">
                             <StackPanel Orientation="Horizontal">
                                 <Label Margin="3" Height="25" Width="50">端口号</Label>
                                 <ComboBox x:Name="comboBoxCOM" Margin="3" Height="20" Width="130"/>
@@ -106,9 +107,9 @@
                         </StackPanel>
 
                     </GroupBox>
-                    <GroupBox Header="接收数据" MinWidth="590" MaxWidth="1000" Width="515">
-                        <ScrollViewer>
-                            <TextBox x:Name="textBoxRecv" MinWidth="300" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"></TextBox>
+                    <GroupBox Header="接收数据" MinWidth="590" MaxWidth="1000" Width="863" Height="407" VerticalAlignment="Top">
+                        <ScrollViewer Margin="0,0,-0,0" Height="425" VerticalAlignment="Top">
+                            <TextBox x:Name="textBoxRecv" MinWidth="300" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Width="833" TextChanged="textBoxRecv_TextChanged" RenderTransformOrigin="0.469,0.517" Height="421"/>
                         </ScrollViewer>
                     </GroupBox>
                 </StackPanel>

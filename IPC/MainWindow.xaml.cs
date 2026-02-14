@@ -1,7 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using System.Windows;
+using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using System.Windows.Input;
+using System.Windows.Controls;
+using System.Globalization;
 
 namespace IPC
 {
@@ -31,6 +37,11 @@ namespace IPC
                 comboBoxEncoding.SelectedIndex = 0;
                 UpdateEncodingFromSelection();
             }
+        }
+        private void TrafficLightControl_Loaded(object? sender, System.Windows.RoutedEventArgs e)
+        {
+            // 如果需要对该控件初始化，可在此处理
+            // var tl = sender as IPC.TrafficLightControl;
         }
 
         /// <summary>
@@ -154,6 +165,93 @@ namespace IPC
             textBoxRecv.Clear();
         }
 
+        private async void pumpOpenClose_Click(string add, object sender, RoutedEventArgs e)
+        {
+            if (!_spManager.IsOpen)
+            {
+                MessageBox.Show("请先打开串口", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            string pumpOpen = "P1,G1,1";
+            string pumpClose = "P1,G1,0";
+
+            pumpOpen = add + pumpOpen;
+            pumpClose = add + pumpClose;
+
+            int pumpState = 0; // 0: 关闭, 1: 开启
+
+            if (pumpState == 1)
+            {
+                _spManager.SendString(pumpClose);
+                await Task.Delay(1000); // 延时1秒（非阻塞）
+                btnOpenCloseCom.Content = "泵关闭";
+                pumpState = 0;
+            }
+            else if (pumpState == 0)
+            {
+                _spManager.SendString(pumpOpen);
+                btnOpenCloseCom.Content = "泵开启";
+                pumpState = 1;
+            }
+
+            try
+            {
+                _spManager.SendString(pumpOpen);
+                Debug.WriteLine("已发送: " + pumpOpen);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"发送失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // 把 HandleRateSet 改为接收 Tag 字符串（例如 "R1"/"R2"/"R3"）
+        private void HandleRateSet(string add)
+        {
+            var tb = add switch
+            {
+                "R1" => textBoxFlowRate1,
+                "R2" => textBoxFlowRate2,
+                "R3" => textBoxFlowRate3,
+                _ => textBoxFlowRate1
+            };
+
+            if (tb == null) return;
+
+            string txt = tb.Text?.Trim() ?? string.Empty;
+            if (!double.TryParse(txt, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out double val))
+            {
+                MessageBox.Show("流速格式不正确，请输入数字（0.000 - 3.000）", "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
+                tb.Text = "0.000";
+                return;
+            }
+
+            // 限定范围并格式化为三位小数
+            val = Math.Clamp(val, 0.0, 3.0);
+            tb.Text = val.ToString("F3", System.Globalization.CultureInfo.InvariantCulture);
+
+            // 如需发送到串口，可以使用 Tag（add）结合协议发送
+            // _spManager.SendString($"{add},FLOW,{val:F3}");
+        }
+
+        // 使用 Tag 为 "R1"/"R2"/"R3" 的按钮通用处理器：调用 pumpOpenClose_Click
+        private void PumpOpenCloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Button btn && btn.Tag is string add)
+            {
+                pumpOpenClose_Click(add, sender, e);
+            }
+        }
+
+        // 使用 Tag 为 "R1"/"R2"/"R3" 的按钮通用处理器：调用 HandleRateSet
+        private void RateSetButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Button btn && btn.Tag is string add)
+            {
+                HandleRateSet(add);
+            }
+        }
+
         /// <summary>
         /// 串口下拉框展开时刷新列表
         /// </summary>
@@ -232,9 +330,87 @@ namespace IPC
             }
         }
 
-        private void textBoxRecv_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        // 新增：为 XAML 中声明的数字输入事件添加处理器
+        private void Numeric_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
+            if (sender is TextBox tb)
+            {
+                // 构造输入后文本以便验证（考虑选中文本会被替换的情况）
+                string current = tb.Text ?? string.Empty;
+                if (tb.SelectionLength > 0)
+                    current = current.Remove(tb.SelectionStart, tb.SelectionLength);
+                string proposed = current.Insert(tb.CaretIndex, e.Text);
 
+                // 允许数字和小数点，且小数位最多 3 位
+                if (!Regex.IsMatch(proposed, @"^\d*(\.\d{0,3})?$"))
+                {
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private void Numeric_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            // 禁止空格，其它控制键（退格、删除、方向键、Tab、Enter）保持默认行为
+            if (e.Key == Key.Space)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void Numeric_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox tb)
+            {
+                string txt = tb.Text?.Trim() ?? string.Empty;
+                if (!double.TryParse(txt, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double val))
+                {
+                    tb.Text = "0.000";
+                    return;
+                }
+
+                val = Math.Clamp(val, 0.0, 3.0);
+                tb.Text = val.ToString("F3", CultureInfo.InvariantCulture);
+            }
+        }
+
+        // 新增：XAML 中引用的 TextChanged 事件处理器，避免缺失引用错误
+        private void textBoxFlowRate_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox tb)
+            {
+                // 只在控件失去焦点时格式化，避免用户输入过程中的干扰
+                if (!tb.IsFocused)
+                {
+                    string txt = tb.Text?.Trim() ?? string.Empty;
+                    if (double.TryParse(txt, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double val))
+                    {
+                        val = Math.Clamp(val, 0.0, 3.0);
+                        string formatted = val.ToString("F3", CultureInfo.InvariantCulture);
+                        if (formatted != tb.Text)
+                        {
+                            tb.Text = formatted;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 新增：修复 XAML 中引用但未在代码中实现的 textBoxRecv_TextChanged 事件处理器
+        private void textBoxRecv_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox tb)
+            {
+                // 当文本由后台线程追加时，将光标置于末尾并滚动到底部，避免 UI 混乱
+                tb.CaretIndex = tb.Text?.Length ?? 0;
+                tb.ScrollToEnd();
+            }
+        }
+
+        // 将 XAML 中引用的 pumpOpenClose_Click 转发到已有的通用处理器
+        private void pumpOpenClose_Click(object sender, RoutedEventArgs e)
+        {
+            PumpOpenCloseButton_Click(sender, e);
         }
     }
 }

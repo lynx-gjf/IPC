@@ -143,11 +143,14 @@
                 <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <Grid.RowDefinitions>
                         <!-- 顶部、主体、底部使用星号或固定最小值混合，便于随窗口变化 -->
-                        <RowDefinition Height="*"/>   <!-- 可用固定最小高度 -->
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="*"/>     <!-- 主体占剩余空间，随窗口变高/变矮 -->
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="*"/>   <!-- 可用固定最小高度 -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- 可用固定最小高度 -->
+                        <RowDefinition Height="153*"/>
+                        <RowDefinition Height="308*"/>
+                        <!-- 主体占剩余空间，随窗口变高/变矮 -->
+                        <RowDefinition Height="60*"/>
+                        <RowDefinition Height="121*"/>
+                        <!-- 可用固定最小高度 -->
                     </Grid.RowDefinitions>
 
                     <!-- 顶部区域 -->
@@ -217,5 +220,6 @@
 
             </TabItem>
         </TabControl>
+        <Image Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="100" Margin="-82,492,0,0" VerticalAlignment="Top" Width="100"/>
     </Grid>
 </Window>

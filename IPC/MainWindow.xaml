@@ -3,17 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:IPC;assembly=IPC"
+        xmlns:local="clr-namespace:IPC"
         mc:Ignorable="d"
-        Title="上位机" Height="716" Width="1089">
+        Title="上位机" Height="848" Width="1257">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*"/>
-            <ColumnDefinition Width="473*"/>
-            <ColumnDefinition Width="418*"/>
-            <ColumnDefinition Width="285*"/>
+            <ColumnDefinition Width="186*"/>
         </Grid.ColumnDefinitions>
-        <TabControl Grid.ColumnSpan="4">
+        <TabControl Grid.ColumnSpan="6">
             <TabItem>
                 <TabItem.Header>
                     <StackPanel>
@@ -21,106 +19,108 @@
                     </StackPanel>
                 </TabItem.Header>
                 <Grid Height="642" VerticalAlignment="Top">
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="206"/>
-                    <ColumnDefinition Width="*"/>
-                  </Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="118.8"/>
+                        <ColumnDefinition Width="14.4"/>
+                        <ColumnDefinition Width="72.8"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                  <!-- 左侧固定宽的串口设置 -->
-                  <GroupBox Header="串口" Grid.Column="0" Width="206" Height="626" VerticalAlignment="Top">
-                    <StackPanel Height="630" RenderTransformOrigin="0.512,0.800">
-                        <StackPanel Orientation="Horizontal">
-                            <Label Margin="3" Height="25" Width="50">端口号</Label>
-                            <ComboBox x:Name="comboBoxCOM" Margin="3" Height="20" Width="130"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Label Margin="3" Height="25" Width="50">波特率</Label>
-                            <ComboBox x:Name="comboBoxBaudRate" Margin="3" Height="20" Width="130" SelectedIndex="0" >
-                                <ComboBoxItem>9600</ComboBoxItem>
-                                <ComboBoxItem>19200</ComboBoxItem>
-                                <ComboBoxItem>38400</ComboBoxItem>
-                                <ComboBoxItem>115200</ComboBoxItem>
-                                <ComboBoxItem>1000000</ComboBoxItem>
-                            </ComboBox>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Label Margin="3" Height="25" Width="50">数据位</Label>
-                            <ComboBox x:Name="comboBoxDataBit" Margin="3" Height="20" Width="130" SelectedIndex="3">
-                                <ComboBoxItem>5</ComboBoxItem>
-                                <ComboBoxItem>6</ComboBoxItem>
-                                <ComboBoxItem>7</ComboBoxItem>
-                                <ComboBoxItem>8</ComboBoxItem>
-                            </ComboBox>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Label Margin="3" Height="25" Width="50">停止位</Label>
-                            <ComboBox x:Name="comboBoxStopBit" Margin="3" Height="20" Width="130" SelectedIndex="0">
-                                <ComboBoxItem>1位</ComboBoxItem>
-                                <ComboBoxItem>1.5位</ComboBoxItem>
-                                <ComboBoxItem>2位</ComboBoxItem>
-                            </ComboBox>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Label Margin="3" Height="25" Width="50">校验位</Label>
-                            <ComboBox x:Name="comboBoxSdd" Margin="3" Height="20" Width="130" SelectedIndex="0">
-                                <ComboBoxItem>无校验</ComboBoxItem>
-                                <ComboBoxItem>奇校验</ComboBoxItem>
-                                <ComboBoxItem>偶校验</ComboBoxItem>
-                                <ComboBoxItem>1 校验</ComboBoxItem>
-                                <ComboBoxItem>0 校验</ComboBoxItem>
-                            </ComboBox>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Label Margin="3" Height="25" Width="50">流控位</Label>
-                            <ComboBox x:Name="comboBoxlik" Margin="3" Height="20" Width="130" SelectedIndex="0" >
-                                <ComboBoxItem>无流控</ComboBoxItem>
-                                <ComboBoxItem>RTS/CTS</ComboBoxItem>
-                                <ComboBoxItem>XON/XOFF</ComboBoxItem>
-                            </ComboBox>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Label Margin="3" Height="25" Width="50">编码</Label>
-                            <ComboBox x:Name="comboBoxEncoding" Margin="3" Height="20" Width="130" SelectedIndex="0" SelectionChanged="ComboBoxEncoding_SelectionChanged">
-                                <ComboBoxItem>UTF-8</ComboBoxItem>
-                                <ComboBoxItem>ASCII</ComboBoxItem>
-                                <ComboBoxItem>GB2312</ComboBoxItem>
-                            </ComboBox>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button x:Name="btnOpenCloseCom" Margin="3" Width="80" Height="25" Click="BtnOpenCloseCom_Click">打开串口</Button>
-                            <Button x:Name="btnClearRecv" Margin="3" Width="80" Height="25" Click="BtnClearRecv_Click">清空接收</Button>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="61">
-                            <TextBox x:Name="textBoxSend" Width="89" Margin="3" VerticalAlignment="Center" />
-                            <Button x:Name="btnSend" Margin="3" Width="80" Height="25" Click="BtnSend_Click">发送</Button>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <CheckBox x:Name="checkBoxAddCRLF" Margin="3" VerticalAlignment="Center" IsChecked="False">自动添加回车换行</CheckBox>
-                        </StackPanel>
+                    <!-- 左侧固定宽的串口设置 -->
+                    <GroupBox Header="串口" Grid.Column="0" Width="206" Height="626" VerticalAlignment="Top" Grid.ColumnSpan="3">
+                        <StackPanel Height="630" RenderTransformOrigin="0.512,0.800">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Margin="3" Height="25" Width="50">端口号</Label>
+                                <ComboBox x:Name="comboBoxCOM" Margin="3" Height="20" Width="130"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Margin="3" Height="25" Width="50">波特率</Label>
+                                <ComboBox x:Name="comboBoxBaudRate" Margin="3" Height="20" Width="130" SelectedIndex="0" >
+                                    <ComboBoxItem>9600</ComboBoxItem>
+                                    <ComboBoxItem>19200</ComboBoxItem>
+                                    <ComboBoxItem>38400</ComboBoxItem>
+                                    <ComboBoxItem>115200</ComboBoxItem>
+                                    <ComboBoxItem>1000000</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Margin="3" Height="25" Width="50">数据位</Label>
+                                <ComboBox x:Name="comboBoxDataBit" Margin="3" Height="20" Width="130" SelectedIndex="3">
+                                    <ComboBoxItem>5</ComboBoxItem>
+                                    <ComboBoxItem>6</ComboBoxItem>
+                                    <ComboBoxItem>7</ComboBoxItem>
+                                    <ComboBoxItem>8</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Margin="3" Height="25" Width="50">停止位</Label>
+                                <ComboBox x:Name="comboBoxStopBit" Margin="3" Height="20" Width="130" SelectedIndex="0">
+                                    <ComboBoxItem>1位</ComboBoxItem>
+                                    <ComboBoxItem>1.5位</ComboBoxItem>
+                                    <ComboBoxItem>2位</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Margin="3" Height="25" Width="50">校验位</Label>
+                                <ComboBox x:Name="comboBoxSdd" Margin="3" Height="20" Width="130" SelectedIndex="0">
+                                    <ComboBoxItem>无校验</ComboBoxItem>
+                                    <ComboBoxItem>奇校验</ComboBoxItem>
+                                    <ComboBoxItem>偶校验</ComboBoxItem>
+                                    <ComboBoxItem>1 校验</ComboBoxItem>
+                                    <ComboBoxItem>0 校验</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Margin="3" Height="25" Width="50">流控位</Label>
+                                <ComboBox x:Name="comboBoxlik" Margin="3" Height="20" Width="130" SelectedIndex="0" >
+                                    <ComboBoxItem>无流控</ComboBoxItem>
+                                    <ComboBoxItem>RTS/CTS</ComboBoxItem>
+                                    <ComboBoxItem>XON/XOFF</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Margin="3" Height="25" Width="50">编码</Label>
+                                <ComboBox x:Name="comboBoxEncoding" Margin="3" Height="20" Width="130" SelectedIndex="0" SelectionChanged="ComboBoxEncoding_SelectionChanged">
+                                    <ComboBoxItem>UTF-8</ComboBoxItem>
+                                    <ComboBoxItem>ASCII</ComboBoxItem>
+                                    <ComboBoxItem>GB2312</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button x:Name="btnOpenCloseCom" Margin="3" Width="80" Height="25" Click="BtnOpenCloseCom_Click">打开串口</Button>
+                                <Button x:Name="btnClearRecv" Margin="3" Width="80" Height="25" Click="BtnClearRecv_Click">清空接收</Button>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="61">
+                                <TextBox x:Name="textBoxSend" Width="89" Margin="3" VerticalAlignment="Center" />
+                                <Button x:Name="btnSend" Margin="3" Width="80" Height="25" Click="BtnSend_Click">发送</Button>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <CheckBox x:Name="checkBoxAddCRLF" Margin="3" VerticalAlignment="Center" IsChecked="False">自动添加回车换行</CheckBox>
+                            </StackPanel>
 
 
-                        <StackPanel Height="3" RenderTransformOrigin="0.5,0.5">
-                            <StackPanel.RenderTransform>
-                                <TransformGroup>
-                                    <ScaleTransform ScaleY="-1"/>
-                                    <SkewTransform/>
-                                    <RotateTransform/>
-                                    <TranslateTransform/>
-                                </TransformGroup>
-                            </StackPanel.RenderTransform>
+                            <StackPanel Height="3" RenderTransformOrigin="0.5,0.5">
+                                <StackPanel.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="-1"/>
+                                        <SkewTransform/>
+                                        <RotateTransform/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </StackPanel.RenderTransform>
+                            </StackPanel>
+                            <TextBox x:Name="textBoxSend2" Width="88" />
+                            <Button x:Name="btnSend2" Margin="3" Width="80" Height="25" Click="btnSend_Click2">发送</Button>
                         </StackPanel>
-                        <TextBox x:Name="textBoxSend2" Width="88" />
-                        <Button x:Name="btnSend2" Margin="3" Width="80" Height="25" Click="btnSend_Click2">发送</Button>
-                    </StackPanel>
 
-                  </GroupBox>
+                    </GroupBox>
 
-                  <!-- 右侧接收区，占满剩余宽度 -->
-                  <GroupBox x:Name="groupBox" Grid.Column="1" Header="接收数据" MinWidth="300" Height="378"
-                            VerticalAlignment="Top" HorizontalAlignment="Stretch">
-                    <ScrollViewer Margin="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                    <!-- 右侧接收区，占满剩余宽度 -->
+                    <GroupBox x:Name="groupBox" Grid.Column="3" Header="接收数据" MinWidth="300" Height="378"
+                            VerticalAlignment="Top">
+                        <ScrollViewer Margin="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                                   VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                      <TextBox x:Name="textBoxRecv"
+                            <TextBox x:Name="textBoxRecv"
                                MinWidth="300"
                                TextWrapping="Wrap"
                                AcceptsReturn="True"
@@ -128,8 +128,8 @@
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"
                                TextChanged="textBoxRecv_TextChanged"/>
-                    </ScrollViewer>
-                  </GroupBox>
+                        </ScrollViewer>
+                    </GroupBox>
                 </Grid>
             </TabItem>
             <TabItem HorizontalAlignment="Left" Margin="-2,-2,0,0" Width="74">
@@ -138,16 +138,72 @@
                         <Label>泵连接</Label>
                     </StackPanel>
                 </TabItem.Header>
-                <StackPanel Orientation="Horizontal" >
-                    <GroupBox Height="384" Header="GroupBox" Width="253">
-                        <StackPanel Height="30" VerticalAlignment="Top" Orientation="Horizontal">
-                            <local:TrafficLightControl Height="32" RenderTransformOrigin="0.597,0.585" Width="22"/>
-                            <Label Height="24" Width="67" Content="泵状态" HorizontalContentAlignment="Center"/>
-                        </StackPanel>
-                    </GroupBox>
-                    <GroupBox Height="384" Header="GroupBox" Width="253"/>
-                    <GroupBox Height="384" Header="GroupBox" Width="253"/>
-                </StackPanel>
+
+                <!-- 父容器：改为 Grid（替换原 StackPanel），去掉固定 Height，使用星号行高以随窗口伸缩） -->
+                <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <!-- 顶部、主体、底部使用星号或固定最小值混合，便于随窗口变化 -->
+                        <RowDefinition Height="*"/>   <!-- 可用固定最小高度 -->
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="*"/>     <!-- 主体占剩余空间，随窗口变高/变矮 -->
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="*"/>   <!-- 可用固定最小高度 -->
+                    </Grid.RowDefinitions>
+
+                    <!-- 顶部区域 -->
+                    <Grid Grid.Row="0" HorizontalAlignment="Stretch" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="TopGroup1" Grid.Column="0" MinHeight="120"/>
+                        <GroupBox Header="TopGroup2" Grid.Column="2" MinHeight="120"/>
+                    </Grid>
+
+                    <!-- 中间主体：三栏，使用星号列以随宽度伸缩 -->
+                    <Grid Grid.Row="2" HorizontalAlignment="Stretch" Margin="0" VerticalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <GroupBox Header="泵A" Grid.Column="0" VerticalAlignment="Top">
+                            <StackPanel Orientation="Horizontal" Height="30">
+                                <local:TrafficLightControl Height="32" Width="22"/>
+                                <Label Content="泵状态" Width="67" HorizontalContentAlignment="Center"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="泵B" Grid.Column="2" VerticalAlignment="Top">
+                            <StackPanel Orientation="Horizontal" Height="30">
+                                <local:TrafficLightControl Height="32" Width="22"/>
+                                <Label Content="泵状态" Width="67" HorizontalContentAlignment="Center"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="泵C" Grid.Column="4" VerticalAlignment="Top">
+                            <StackPanel Orientation="Horizontal" Height="30">
+                                <local:TrafficLightControl Height="32" Width="22"/>
+                                <Label Content="泵状态" Width="67" HorizontalContentAlignment="Center"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </Grid>
+
+                    <!-- 底部区域 -->
+                    <Grid Grid.Row="4" HorizontalAlignment="Stretch" Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="TopGroup1" Grid.Column="0" MinHeight="120"/>
+                        <GroupBox Header="TopGroup2" Grid.Column="2" MinHeight="120"/>
+                    </Grid>
+                </Grid>
             </TabItem>
             <TabItem HorizontalAlignment="Left" Margin="-2,-2,0,0" Width="74">
                 <TabItem.Header>

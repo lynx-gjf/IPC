@@ -31,7 +31,7 @@
                         <StackPanel Height="630" RenderTransformOrigin="0.512,0.800">
                             <StackPanel Orientation="Horizontal">
                                 <Label Margin="3" Height="25" Width="50">端口号</Label>
-                                <ComboBox x:Name="comboBoxCOM" Margin="3" Height="20" Width="130"/>
+                                <ComboBox x:Name="comboBoxCOM" Margin="3" Height="20" Width="130" SelectionChanged="comboBoxCOM_SelectionChanged"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label Margin="3" Height="25" Width="50">波特率</Label>
@@ -156,17 +156,18 @@
                     <!-- 顶部区域 -->
                     <Grid Grid.Row="0" Margin="0,0,0,8">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="96*"/>
-                            <ColumnDefinition Width="112*"/>
-                            <ColumnDefinition Width="209*"/>
+                            <ColumnDefinition Width="616*"/>
+                            <ColumnDefinition Width="8*"/>
+                            <ColumnDefinition Width="627*"/>
                         </Grid.ColumnDefinitions>
-                        <GroupBox Header="TopGroup1" Grid.Column="0" MinHeight="30" Margin="0,0,6,0" Grid.ColumnSpan="2"/>
-                        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2">
+                        <GroupBox Header="TopGroup1" Grid.Column="0" MinHeight="30" Margin="0,0,6,0" Grid.ColumnSpan="3"/>
+                        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="3">
                             <Label Margin="3,10,3,3" Height="25" Width="50" VerticalAlignment="Center">端口号</Label>
-                            <ComboBox x:Name="comboBoxCOM1" Margin="3,10,3,3" Height="20" Width="130" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="comboBoxCOM1" Margin="3,10,3,3" Height="20" Width="130" VerticalAlignment="Center" SelectionChanged="comboBoxCOM1_SelectionChanged"/>
                             <Button x:Name="btnOpenCloseCom1" Margin="3,10,3,3" Width="60" Height="25" Click="BtnOpenCloseCom_Click" VerticalAlignment="Center">打开串口</Button>
+                            <Button x:Name="btnRefreshPorts1" Margin="3,10,3,3" Width="60" Height="25" Click="BtnRefreshPorts_Click" VerticalAlignment="Center">刷新端口</Button>
                         </StackPanel>
-                        <GroupBox Header="TopGroup2" Grid.Column="1" MinHeight="30"/>
+                        <GroupBox Header="TopGroup2" Grid.Column="2" MinHeight="30"/>
                     </Grid>
 
                     <!-- 中间主体：三栏，使用星号列以随宽度伸缩 -->

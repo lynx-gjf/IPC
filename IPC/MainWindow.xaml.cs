@@ -45,14 +45,26 @@ namespace IPC
         }
 
         /// <summary>
-        /// 刷新串口列表
+        /// 刷新串口列表（同时更新两个 ComboBox）
         /// </summary>
         private void RefreshPortList()
         {
             string[] ports = _spManager.GetPortNames();
+
+            // 同步更新两个下拉框的项
             comboBoxCOM.ItemsSource = ports;
+            comboBoxCOM1.ItemsSource = ports;
+
             if (ports.Length > 0)
+            {
                 comboBoxCOM.SelectedIndex = 0;
+                comboBoxCOM1.SelectedIndex = 0;
+            }
+            else
+            {
+                comboBoxCOM.SelectedIndex = -1;
+                comboBoxCOM1.SelectedIndex = -1;
+            }
         }
 
         /// <summary>
@@ -253,6 +265,19 @@ namespace IPC
         }
 
         /// <summary>
+        /// 串口下拉框选择改变事件（在 XAML 中引用）
+        /// </summary>
+        private void comboBoxCOM_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            // 如果需要响应端口选择变化，可在此处理。
+            // 当前仅记录调试信息并确保选中的端口字符串可用。
+            if (comboBoxCOM?.SelectedItem is string port)
+            {
+                Debug.WriteLine($"已选择串口: {port}");
+            }
+        }
+
+        /// <summary>
         /// 串口下拉框展开时刷新列表
         /// </summary>
         private void ComboBoxCOM_DropDownOpened(object sender, EventArgs e)
@@ -411,6 +436,24 @@ namespace IPC
         private void pumpOpenClose_Click(object sender, RoutedEventArgs e)
         {
             PumpOpenCloseButton_Click(sender, e);
+        }
+
+        /// <summary>
+        /// 为 XAML 中可能引用的 comboBoxCOM1 添加 SelectionChanged 事件处理器，复用 comboBoxCOM 的逻辑
+        /// </summary>
+        private void comboBoxCOM1_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            // 如果两个组合框都需要相同处理，直接复用已有实现
+            comboBoxCOM_SelectionChanged(sender, e);
+        }
+
+        /// <summary>
+        /// 顶部面板的“刷新端口”按钮处理器（复用 RefreshPortList）
+        /// </summary>
+        private void BtnRefreshPorts_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshPortList();
+            Debug.WriteLine("已刷新串口列表（由 btnRefreshPorts1 触发）");
         }
     }
 }

@@ -187,7 +187,7 @@
                                 <StackPanel x:Name="stackPanel" Tag="R1" Orientation="Horizontal" Height="30" VerticalAlignment="Center">
 
                                     <Label Content="泵状态" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
-                                    <local:TrafficLightControl Height="32" Width="22" Grid.IsSharedSizeScope="True" Margin="10,0,0,0"/>
+                                    <local:TrafficLightControl Height="32" Width="22" Grid.IsSharedSizeScope="True" Margin="20,0,0,0"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0">
 
@@ -215,7 +215,7 @@
                                 <StackPanel Orientation="Horizontal" Height="30" VerticalAlignment="Center" HorizontalAlignment="Left">
 
                                     <Label Content="泵状态" Width="67" HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
-                                    <local:TrafficLightControl Height="32" Width="22" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                    <local:TrafficLightControl Height="32" Width="22" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,0,0,0"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0">
                                     <!-- 在此添加泵B 的控制按钮或状态显示 -->
@@ -231,8 +231,8 @@
                                              LostFocus="Numeric_LostFocus"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Height="56" Margin="0,8,0,0">
-                                    <Button x:Name="btnPump2" Tag="R2" Margin="88,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click">打开串口</Button>
-                                    <Button x:Name="pumpSet2" Tag="R2" Margin="35,3,3,3" Width="80" Height="25" Click="RateSetButton_Click">清空接收</Button>
+                                    <Button x:Name="btnPump2" Tag="R2" Margin="88,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click">打开泵</Button>
+                                    <Button x:Name="pumpSet2" Tag="R2" Margin="35,3,3,3" Width="80" Height="25" Click="RateSetButton_Click">流量设定</Button>
                                 </StackPanel>
                             </StackPanel>
                         </GroupBox>
@@ -242,7 +242,7 @@
                                 <StackPanel Orientation="Horizontal" Height="30" VerticalAlignment="Center">
 
                                     <Label Content="泵状态" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="120,0,0,0"/>
-                                    <local:TrafficLightControl Height="32" Width="22" Loaded="TrafficLightControl_Loaded" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                    <local:TrafficLightControl Height="32" Width="22" Loaded="TrafficLightControl_Loaded" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,0,0,0"/>
                                 </StackPanel>
                                 <!-- 新增：泵C 下方备用 StackPanel -->
                                 <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0" VerticalAlignment="Center">
@@ -259,8 +259,8 @@
                                     <!-- 在此添加泵C 的控制按钮或状态显示 -->
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Height="56" Margin="0,8,0,0">
-                                    <Button x:Name="btnPump3" Tag="R3" Margin="88,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click">打开串口</Button>
-                                    <Button x:Name="pumpSet3" Tag="R3" Margin="35,3,3,3" Width="80" Height="25" Click="RateSetButton_Click">清空接收</Button>
+                                    <Button x:Name="btnPump3" Tag="R3" Margin="88,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click">打开泵</Button>
+                                    <Button x:Name="pumpSet3" Tag="R3" Margin="35,3,3,3" Width="80" Height="25" Click="RateSetButton_Click">流量设定</Button>
                                 </StackPanel>
 
                             </StackPanel>

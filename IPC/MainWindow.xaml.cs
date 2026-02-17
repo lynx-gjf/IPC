@@ -28,6 +28,12 @@ namespace IPC
             // 获取所有可用串口端口，并添加到comboBoxCOM
             RefreshPortList();
 
+            // 同步 btnOpenCloseCom 的显示文字到 btnOpenCloseCom1（如果存在）
+            if (btnOpenCloseCom != null && btnOpenCloseCom1 != null)
+            {
+                SetOpenCloseButtonsContent(btnOpenCloseCom.Content?.ToString() ?? "打开串口");
+            }
+
             // 订阅数据接收事件（非 UI 线程触发）
             _spManager.DataReceived += SpManager_DataReceived;
 
@@ -38,6 +44,15 @@ namespace IPC
                 UpdateEncodingFromSelection();
             }
         }
+
+        private void SetOpenCloseButtonsContent(string text)
+        {
+            if (btnOpenCloseCom != null)
+                btnOpenCloseCom.Content = text;
+            if (btnOpenCloseCom1 != null)
+                btnOpenCloseCom1.Content = text;
+        }
+
         private void TrafficLightControl_Loaded(object? sender, System.Windows.RoutedEventArgs e)
         {
             // 如果需要对该控件初始化，可在此处理
@@ -114,7 +129,7 @@ namespace IPC
             if (_spManager.IsOpen)
             {
                 _spManager.Close();
-                btnOpenCloseCom.Content = "打开串口";
+                SetOpenCloseButtonsContent("打开串口");
                 Debug.WriteLine("关闭串口成功");
 
                 // 启用配置控件
@@ -150,7 +165,7 @@ namespace IPC
                     UpdateEncodingFromSelection();
 
                     _spManager.Open(portName, baud);
-                    btnOpenCloseCom.Content = "关闭串口";
+                    SetOpenCloseButtonsContent("关闭串口");
                     Debug.WriteLine($"打开串口成功: {portName}, 波特率: {baud}");
 
                     // 禁用配置控件

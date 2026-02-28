@@ -202,6 +202,8 @@ namespace IPC
             string pumpOpen = "P1,G1,1";
             string pumpClose = "P1,G1,0";
 
+            add = add + ",";
+
             pumpOpen = add + pumpOpen;
             pumpClose = add + pumpClose;
 
@@ -211,13 +213,13 @@ namespace IPC
             {
                 _spManager.SendString(pumpClose);
                 await Task.Delay(1000); // 延时1秒（非阻塞）
-                btnOpenCloseCom.Content = "泵关闭";
+                btnOpenCloseCom.Content = "关闭注射泵";
                 pumpState = 0;
             }
             else if (pumpState == 0)
             {
                 _spManager.SendString(pumpOpen);
-                btnOpenCloseCom.Content = "泵开启";
+                btnOpenCloseCom.Content = "开启注射泵";
                 pumpState = 1;
             }
 

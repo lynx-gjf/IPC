@@ -25,61 +25,33 @@ namespace IPC
             // 注册 CodePages 提供器,以便支持 GBK/GB2312 等编码（仅需一次）
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            // 获取所有可用串口端口，并添加到comboBoxCOM
             RefreshPortList();
 
-            // 同步 btnOpenCloseCom 的显示文字到 btnOpenCloseCom1（如果存在）
-            if (btnOpenCloseCom != null && btnOpenCloseCom1 != null)
-            {
-                SetOpenCloseButtonsContent(btnOpenCloseCom.Content?.ToString() ?? "打开串口");
-            }
+            // 仅保留泵连接页按钮
+            SetOpenCloseButtonsContent("打开串口");
 
             // 订阅数据接收事件（非 UI 线程触发）
             _spManager.DataReceived += SpManager_DataReceived;
 
-            // 初始化编码选择（默认 UTF-8）
-            if (comboBoxEncoding != null)
-            {
-                comboBoxEncoding.SelectedIndex = 0;
-                UpdateEncodingFromSelection();
-            }
+            // 串口设置页已删除：编码固定 UTF-8
+            _spManager.Encoding = Encoding.UTF8;
         }
 
         private void SetOpenCloseButtonsContent(string text)
         {
-            if (btnOpenCloseCom != null)
-                btnOpenCloseCom.Content = text;
             if (btnOpenCloseCom1 != null)
                 btnOpenCloseCom1.Content = text;
         }
 
-        private void TrafficLightControl_Loaded(object? sender, System.Windows.RoutedEventArgs e)
-        {
-            // 如果需要对该控件初始化，可在此处理
-            // var tl = sender as IPC.TrafficLightControl;
-        }
-
         /// <summary>
-        /// 刷新串口列表（同时更新两个 ComboBox）
+        /// 刷新串口列表（仅更新泵连接页 COM）
         /// </summary>
         private void RefreshPortList()
         {
             string[] ports = _spManager.GetPortNames();
 
-            // 同步更新两个下拉框的项
-            comboBoxCOM.ItemsSource = ports;
             comboBoxCOM1.ItemsSource = ports;
-
-            if (ports.Length > 0)
-            {
-                comboBoxCOM.SelectedIndex = 0;
-                comboBoxCOM1.SelectedIndex = 0;
-            }
-            else
-            {
-                comboBoxCOM.SelectedIndex = -1;
-                comboBoxCOM1.SelectedIndex = -1;
-            }
+            comboBoxCOM1.SelectedIndex = ports.Length > 0 ? 0 : -1;
         }
 
         /// <summary>
@@ -89,40 +61,36 @@ namespace IPC
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
-                textBoxRecv.AppendText(data);
-                textBoxRecv.ScrollToEnd();
+                string ts = DateTime.Now.ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture);
+                string line = $"[{ts}] {data}";
+
+                textBoxDebugRecv.AppendText(line);
+                if (!line.EndsWith("\n", StringComparison.Ordinal))
+                {
+                    textBoxDebugRecv.AppendText(Environment.NewLine);
+                }
+                textBoxDebugRecv.ScrollToEnd();
             }));
         }
 
         /// <summary>
-        /// 根据选择更新编码
+        /// 串口设置页已删除：固定 UTF-8
         /// </summary>
         private void UpdateEncodingFromSelection()
         {
-            if (comboBoxEncoding == null) return;
-
-            Encoding chosen = comboBoxEncoding.SelectedIndex switch
-            {
-                0 => Encoding.UTF8,
-                1 => Encoding.ASCII,
-                2 => Encoding.GetEncoding("GB2312"),
-                _ => Encoding.UTF8
-            };
-
-            _spManager.Encoding = chosen;
-            Debug.WriteLine($"编码已切换为: {chosen.EncodingName}");
+            _spManager.Encoding = Encoding.UTF8;
         }
 
-        /// <summary>
-        /// 编码选择改变事件
-        /// </summary>
-        private void ComboBoxEncoding_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void ComboBoxEncoding_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             UpdateEncodingFromSelection();
         }
 
+        // 波特率固定 115200
+        private int GetSelectedBaudRate() => 115200;
+
         /// <summary>
-        /// 打开/关闭串口
+        /// 打开/关闭串口（仅使用 comboBoxCOM1，波特率固定 115200）
         /// </summary>
         private void BtnOpenCloseCom_Click(object sender, RoutedEventArgs e)
         {
@@ -131,50 +99,25 @@ namespace IPC
                 _spManager.Close();
                 SetOpenCloseButtonsContent("打开串口");
                 Debug.WriteLine("关闭串口成功");
-
-                // 启用配置控件
-                comboBoxBaudRate.IsEnabled = true;
-                comboBoxCOM.IsEnabled = true;
-                comboBoxDataBit.IsEnabled = true;
-                comboBoxStopBit.IsEnabled = true;
-                comboBoxSdd.IsEnabled = true;
-                comboBoxlik.IsEnabled = true;
+                comboBoxCOM1.IsEnabled = true;
             }
             else
             {
-                string? portName = comboBoxCOM.SelectedItem as string;
+                string? portName = comboBoxCOM1.SelectedItem as string;
                 if (string.IsNullOrEmpty(portName))
                 {
                     MessageBox.Show("请选择串口", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                int baud = comboBoxBaudRate.SelectedIndex switch
-                {
-                    0 => 9600,
-                    1 => 19200,
-                    2 => 38400,
-                    3 => 115200,
-                    4 => 1000000,
-                    _ => 9600
-                };
+                const int baud = 115200;
 
                 try
                 {
-                    // 在打开前确保使用当前选择的编码
-                    UpdateEncodingFromSelection();
-
                     _spManager.Open(portName, baud);
                     SetOpenCloseButtonsContent("关闭串口");
                     Debug.WriteLine($"打开串口成功: {portName}, 波特率: {baud}");
-
-                    // 禁用配置控件
-                    comboBoxBaudRate.IsEnabled = false;
-                    comboBoxCOM.IsEnabled = false;
-                    comboBoxDataBit.IsEnabled = false;
-                    comboBoxStopBit.IsEnabled = false;
-                    comboBoxSdd.IsEnabled = false;
-                    comboBoxlik.IsEnabled = false;
+                    comboBoxCOM1.IsEnabled = false;
                 }
                 catch (Exception ex)
                 {
@@ -183,222 +126,44 @@ namespace IPC
             }
         }
 
-        /// <summary>
-        /// 清空接收区
-        /// </summary>
         private void BtnClearRecv_Click(object sender, RoutedEventArgs e)
         {
             _spManager.ClearBuffer();
-            textBoxRecv.Clear();
+            textBoxDebugRecv.Clear();
         }
 
-        private async void pumpOpenClose_Click(string add, object sender, RoutedEventArgs e)
+        private void comboBoxCOM_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!_spManager.IsOpen)
-            {
-                MessageBox.Show("请先打开串口", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            string pumpOpen = "P1,G1,1";
-            string pumpClose = "P1,G1,0";
-
-            add = add + ",";
-
-            pumpOpen = add + pumpOpen;
-            pumpClose = add + pumpClose;
-
-            if (sender is not Button btn)
-            {
-                MessageBox.Show("无法识别泵按钮", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            string btnText = btn.Content?.ToString() ?? string.Empty;
-            string commandToSend;
-
-            if (btnText.Contains("关闭"))
-            {
-                commandToSend = pumpClose;
-                btn.Content = "开启注射泵";
-            }
-            else
-            {
-                commandToSend = pumpOpen;
-                btn.Content = "关闭注射泵";
-            }
-
-            try
-            {
-                _spManager.SendString(commandToSend);
-                await Task.Delay(1000); // 延时1秒（非阻塞）
-                Debug.WriteLine("已发送: " + commandToSend);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"发送失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        // 把 HandleRateSet 改为接收 Tag 字符串（例如 "R1"/"R2"/"R3"）
-        private void HandleRateSet(string add)
-        {
-            var tb = add switch
-            {
-                "R1" => textBoxFlowRate1,
-                "R2" => textBoxFlowRate2,
-                "R3" => textBoxFlowRate3,
-                _ => textBoxFlowRate1
-            };
-
-            if (tb == null) return;
-
-            string txt = tb.Text?.Trim() ?? string.Empty;
-            if (!double.TryParse(txt, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out double val))
-            {
-                MessageBox.Show("流速格式不正确，请输入数字（0.000 - 3.000）", "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
-                tb.Text = "0.000";
-                return;
-            }
-
-            // 限定范围并格式化为三位小数
-            val = Math.Clamp(val, 0.0, 3.0);
-            tb.Text = val.ToString("F3", System.Globalization.CultureInfo.InvariantCulture);
-
-            // 如需发送到串口，可以使用 Tag（add）结合协议发送
-            // _spManager.SendString($"{add},FLOW,{val:F3}");
-        }
-
-        // 使用 Tag 为 "R1"/"R2"/"R3" 的按钮通用处理器：调用 pumpOpenClose_Click
-        private void PumpOpenCloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is System.Windows.Controls.Button btn && btn.Tag is string add)
-            {
-                pumpOpenClose_Click(add, sender, e);
-            }
-        }
-
-        // 使用 Tag 为 "R1"/"R2"/"R3" 的按钮通用处理器：调用 HandleRateSet
-        private void RateSetButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is System.Windows.Controls.Button btn && btn.Tag is string add)
-            {
-                HandleRateSet(add);
-            }
-        }
-
-        /// <summary>
-        /// 串口下拉框选择改变事件（在 XAML 中引用）
-        /// </summary>
-        private void comboBoxCOM_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-            // 如果需要响应端口选择变化，可在此处理。
-            // 当前仅记录调试信息并确保选中的端口字符串可用。
-            if (comboBoxCOM?.SelectedItem is string port)
+            if (sender is ComboBox cb && cb.SelectedItem is string port)
             {
                 Debug.WriteLine($"已选择串口: {port}");
             }
         }
 
-        /// <summary>
-        /// 串口下拉框展开时刷新列表
-        /// </summary>
-        private void ComboBoxCOM_DropDownOpened(object sender, EventArgs e)
+        private void comboBoxCOM1_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            comboBoxCOM_SelectionChanged(sender, e);
+        }
+
+        private void BtnRefreshPorts_Click(object sender, RoutedEventArgs e)
         {
             RefreshPortList();
         }
 
-        /// <summary>
-        /// 发送按钮1 - 发送字符串
-        /// </summary>
-        private void BtnSend_Click(object sender, RoutedEventArgs e)
-        {
-            if (!_spManager.IsOpen)
-            {
-                MessageBox.Show("请先打开串口", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            string toSend = textBoxSend?.Text ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(toSend))
-            {
-                MessageBox.Show("发送内容为空", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            // 如果勾选了自动添加回车换行,则添加\r\n
-            if (checkBoxAddCRLF?.IsChecked == true)
-            {
-                toSend += "\r\n";
-            }
-
-            try
-            {
-                _spManager.SendString(toSend);
-                Debug.WriteLine("已发送: " + toSend);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"发送失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        /// <summary>
-        /// 发送按钮2 - 发送字符串
-        /// </summary>
-        private void btnSend_Click2(object sender, RoutedEventArgs e)
-        {
-            if (!_spManager.IsOpen)
-            {
-                MessageBox.Show("请先打开串口", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            string toSend = textBoxSend2?.Text ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(toSend))
-            {
-                MessageBox.Show("发送内容为空", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            // 如果勾选了自动添加回车换行,则添加\r\n
-            if (checkBoxAddCRLF?.IsChecked == true)
-            {
-                toSend += "\r\n";
-            }
-
-            try
-            {
-                _spManager.SendString(toSend);
-                Debug.WriteLine("已发送: " + toSend);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"发送失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        // 新增：为 XAML 中声明的数字输入事件添加处理器
         private void Numeric_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            if (sender is TextBox tb)
+            if (sender is not TextBox textBox)
             {
-                // 构造输入后文本以便验证（考虑选中文本会被替换的情况）
-                string current = tb.Text ?? string.Empty;
-                if (tb.SelectionLength > 0)
-                    current = current.Remove(tb.SelectionStart, tb.SelectionLength);
-                string proposed = current.Insert(tb.CaretIndex, e.Text);
-
-                // 允许数字和小数点，且小数位最多 3 位
-                if (!Regex.IsMatch(proposed, @"^\d*(\.\d{0,3})?$"))
-                {
-                    e.Handled = true;
-                }
+                e.Handled = true;
+                return;
             }
+
+            e.Handled = !Regex.IsMatch(e.Text, "^[0-9.]$")
+                        || (e.Text == "." && textBox.Text.Contains('.'));
         }
 
         private void Numeric_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            // 禁止空格，其它控制键（退格、删除、方向键、Tab、Enter）保持默认行为
             if (e.Key == Key.Space)
             {
                 e.Handled = true;
@@ -407,75 +172,179 @@ namespace IPC
 
         private void Numeric_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (sender is TextBox tb)
+            if (sender is TextBox textBox)
             {
-                string txt = tb.Text?.Trim() ?? string.Empty;
-                if (!double.TryParse(txt, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double val))
+                if (double.TryParse(textBox.Text, out var value))
                 {
-                    tb.Text = "0.000";
-                    return;
+                    textBox.Text = value.ToString("0.000", CultureInfo.InvariantCulture);
                 }
-
-                val = Math.Clamp(val, 0.0, 3.0);
-                tb.Text = val.ToString("F3", CultureInfo.InvariantCulture);
+                else
+                {
+                    textBox.Text = "0.000";
+                }
             }
         }
 
-        // 新增：XAML 中引用的 TextChanged 事件处理器，避免缺失引用错误
         private void textBoxFlowRate_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (sender is TextBox tb)
-            {
-                // 只在控件失去焦点时格式化，避免用户输入过程中的干扰
-                if (!tb.IsFocused)
-                {
-                    string txt = tb.Text?.Trim() ?? string.Empty;
-                    if (double.TryParse(txt, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double val))
-                    {
-                        val = Math.Clamp(val, 0.0, 3.0);
-                        string formatted = val.ToString("F3", CultureInfo.InvariantCulture);
-                        if (formatted != tb.Text)
-                        {
-                            tb.Text = formatted;
-                        }
-                    }
-                }
-            }
+            // 预留：可在此实现流速联动逻辑
         }
 
-        // 新增：修复 XAML 中引用但未在代码中实现的 textBoxRecv_TextChanged 事件处理器
-        private void textBoxRecv_TextChanged(object sender, TextChangedEventArgs e)
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (sender is TextBox tb)
-            {
-                // 当文本由后台线程追加时，将光标置于末尾并滚动到底部，避免 UI 混乱
-                tb.CaretIndex = tb.Text?.Length ?? 0;
-                tb.ScrollToEnd();
-            }
+            // 预留：用于静态文本框事件占位
         }
 
-        // 将 XAML 中引用的 pumpOpenClose_Click 转发到已有的通用处理器
         private void pumpOpenClose_Click(object sender, RoutedEventArgs e)
         {
-            PumpOpenCloseButton_Click(sender, e);
+            if (sender is not Button btn)
+            {
+                return;
+            }
+
+            string tag = btn.Tag?.ToString() ?? string.Empty;
+            string pumpNo = tag switch
+            {
+                "R1" => "1",
+                "R2" => "2",
+                "R3" => "3",
+                _ => string.Empty
+            };
+
+            if (string.IsNullOrEmpty(pumpNo))
+            {
+                return;
+            }
+
+            bool isOpenAction = Equals(btn.Content, "开启注射泵");
+            string b = isOpenAction ? "1" : "0";
+            string cmd = $"R{pumpNo},P1,G1,{b}";
+
+            try
+            {
+                _spManager.SendString(cmd);
+                btn.Content = isOpenAction ? "关闭注射泵" : "开启注射泵";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"发送失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        /// <summary>
-        /// 为 XAML 中可能引用的 comboBoxCOM1 添加 SelectionChanged 事件处理器，复用 comboBoxCOM 的逻辑
-        /// </summary>
-        private void comboBoxCOM1_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void RateSetButton_Click(object sender, RoutedEventArgs e)
         {
-            // 如果两个组合框都需要相同处理，直接复用已有实现
-            comboBoxCOM_SelectionChanged(sender, e);
+            if (sender is not Button button)
+            {
+                return;
+            }
+
+            string tag = button.Tag?.ToString() ?? string.Empty;
+            string pumpNo = tag switch
+            {
+                "R1" => "1",
+                "R2" => "2",
+                "R3" => "3",
+                _ => string.Empty
+            };
+
+            TextBox? source = tag switch
+            {
+                "R1" => textBoxFlowRate1,
+                "R2" => textBoxFlowRate2,
+                "R3" => textBoxFlowRate3,
+                _ => null
+            };
+
+            if (source is null || string.IsNullOrEmpty(pumpNo))
+            {
+                return;
+            }
+
+            if (tag == "R1") RateShow1.Text = source.Text;
+            if (tag == "R2") RateShow2.Text = source.Text;
+            if (tag == "R3") RateShow3.Text = source.Text;
+
+            // 支持用户输入逗号或点
+            string input = source.Text.Trim().Replace(',', '.');
+            if (!decimal.TryParse(input, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal rate))
+            {
+                MessageBox.Show("流速格式无效", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (rate < 0m)
+            {
+                MessageBox.Show("流速不能为负数", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // 改这里：不要再限制 0.3
+            const decimal maxRate = 9.9999m; // 协议5位(×10000)可表示到 9.9999
+            if (rate > maxRate)
+            {
+                MessageBox.Show($"流速不能大于 {maxRate:0.####}", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            int raw = (int)Math.Round(rate * 10000m, MidpointRounding.AwayFromZero);
+            string value = raw.ToString("D5", CultureInfo.InvariantCulture); // 0.1 -> 01000
+            string cmd = $"R{pumpNo},P1,S3,{value}";
+
+            try
+            {
+                _spManager.SendString(cmd);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"发送失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        /// <summary>
-        /// 顶部面板的“刷新端口”按钮处理器（复用 RefreshPortList）
-        /// </summary>
-        private void BtnRefreshPorts_Click(object sender, RoutedEventArgs e)
+        private void BtnDebugSend_Click(object sender, RoutedEventArgs e)
         {
-            RefreshPortList();
-            Debug.WriteLine("已刷新串口列表（由 btnRefreshPorts1 触发）");
+            string text = textBoxDebugSend.Text;
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return;
+            }
+
+            try
+            {
+                _spManager.SendString(text);
+                textBoxDebugSend.Clear();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"发送失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void btnSend_Click2(object sender, RoutedEventArgs e)
+        {
+            string text = textBoxSend2.Text;
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return;
+            }
+
+            try
+            {
+                _spManager.SendString(text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"发送失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void textBoxRecv_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            textBoxRecv.ScrollToEnd();
+        }
+
+        private void TrafficLightControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            // TODO: 初始化逻辑
         }
     }
 }

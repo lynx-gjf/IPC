@@ -12,10 +12,241 @@
             <ColumnDefinition Width="186*"/>
         </Grid.ColumnDefinitions>
         <TabControl Grid.ColumnSpan="6">
-            <TabItem>
+            <TabItem HorizontalAlignment="Left" Margin="-2,-2,0,0" Width="74">
                 <TabItem.Header>
                     <StackPanel>
-                        <Label>串口设置</Label>
+                        <Label>泵连接</Label>
+                    </StackPanel>
+                </TabItem.Header>
+
+                <!-- 父容器：改为 Grid（替换原 StackPanel），去掉固定 Height，使用星号行高以随窗口伸缩） -->
+                <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <!-- 顶部、主体、底部使用星号或固定最小值混合，便于随窗口变化 -->
+                        <RowDefinition Height="Auto" MinHeight="64"/>
+                        <!--  -->
+                        <RowDefinition Height="2" MinHeight="1"/>
+                        <!-- 可用固定最小高度 -->
+                        <RowDefinition Height="Auto" MinHeight="190"/>
+                        <!-- 主体占剩余空间，随窗口变高/变矮 -->
+                        <RowDefinition Height="2"/>
+                        <RowDefinition Height="Auto" MinHeight="150"/>
+                        <!-- 可用固定最小高度 -->
+                    </Grid.RowDefinitions>
+
+                    <!-- 顶部区域 -->
+                    <Grid Grid.Row="0" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="593*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="627*"/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="仪器连接" Grid.Column="0" MinHeight="30" Margin="0,0,6,0" Grid.ColumnSpan="3"/>
+                        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="3">
+                            <Label Margin="3,10,3,3" Height="25" Width="50" VerticalAlignment="Center">端口号</Label>
+                            <ComboBox x:Name="comboBoxCOM1" Margin="3,10,3,3" Height="20" Width="130" VerticalAlignment="Center" SelectionChanged="comboBoxCOM1_SelectionChanged"/>
+                            <Button x:Name="btnOpenCloseCom1" Margin="3,10,3,3" Width="60" Height="25" Click="BtnOpenCloseCom_Click" VerticalAlignment="Center">打开串口</Button>
+                            <Button x:Name="btnRefreshPorts1" Margin="3,10,3,3" Width="60" Height="25" Click="BtnRefreshPorts_Click" VerticalAlignment="Center">刷新端口</Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 中间主体：三栏，使用星号列以随宽度伸缩 -->
+                    <Grid Grid.Row="2" Margin="0,9,0,0" Grid.RowSpan="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="2"/>
+
+                        <GroupBox Header="泵A" Grid.Column="0" VerticalAlignment="Top" Grid.ColumnSpan="2" Margin="0,0,8,0">
+                            <StackPanel>
+                                <StackPanel x:Name="stackPanel" Tag="R1" Orientation="Horizontal" Height="30" VerticalAlignment="Center">
+
+                                    <Label Content="泵状态" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
+                                    <local:TrafficLightControl Height="32" Width="22" Grid.IsSharedSizeScope="True" Margin="46,0,0,0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0">
+
+                                    <Label Content="流速显示" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
+                                    <TextBox x:Name="RateShow1"
+                                             Tag="R1"
+                                             Text="0.000"
+                                             Width="69" Height="18"
+                                             TextAlignment="Right"
+                                             InputMethod.IsInputMethodEnabled="False"
+                                             PreviewTextInput="Numeric_PreviewTextInput"
+                                             PreviewKeyDown="Numeric_PreviewKeyDown"
+                                             LostFocus="Numeric_LostFocus" TextChanged="textBoxFlowRate_TextChanged" Margin="20,0,0,0"/>
+                                    <TextBox TextWrapping="Wrap" Text="ml/min" Width="69" Height="18" Margin="3,0,0,0" TextChanged="TextBox_TextChanged" VerticalContentAlignment="Center" BorderThickness="0,0,0,0"/>
+                                    <!-- 在此添加泵A 的控制按钮或状态显示 -->
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Height="35" Margin="0,8,0,0">
+                                    <Button x:Name="btnPump1" Tag="R1" Margin="98,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click" Content="开启注射泵"/>
+                                    <Button x:Name="pumpSet1" Tag="R1" Margin="26,3,3,3" Width="80" Height="25" Click="RateSetButton_Click">流量设定</Button>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0">
+
+                                    <Label Content="流速设定" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
+                                    <TextBox x:Name="textBoxFlowRate1"
+                                             Tag="R1"
+                                             Text="0.000"
+                                             Width="69" Height="18"
+                                             TextAlignment="Right"
+                                             InputMethod.IsInputMethodEnabled="False"
+                                             PreviewTextInput="Numeric_PreviewTextInput"
+                                             PreviewKeyDown="Numeric_PreviewKeyDown"
+                                             LostFocus="Numeric_LostFocus" TextChanged="textBoxFlowRate_TextChanged" Margin="20,0,0,0"/>
+                                    <TextBox TextWrapping="Wrap" Text="ml/min" Width="69" Height="18" Margin="3,0,0,0" TextChanged="TextBox_TextChanged" VerticalContentAlignment="Center" BorderThickness="0,0,0,0"/>
+                                    <!-- 在此添加泵A 的控制按钮或状态显示 -->
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="泵B" Grid.Column="2" VerticalAlignment="Top">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Height="30" VerticalAlignment="Center" HorizontalAlignment="Left">
+
+                                    <Label Content="泵状态" Width="67" HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
+                                    <local:TrafficLightControl Height="32" Width="22" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="46,0,0,0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0">
+                                    <!-- 在此添加泵B 的控制按钮或状态显示 -->
+                                    <Label Content="流速显示" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
+                                    <TextBox x:Name="RateShow2"
+                                             Tag="R2"
+                                             Text="0.000"
+                                             Width="69" Height="18"
+                                             TextAlignment="Right"
+                                             InputMethod.IsInputMethodEnabled="False"
+                                             PreviewTextInput="Numeric_PreviewTextInput"
+                                             PreviewKeyDown="Numeric_PreviewKeyDown"
+                                             LostFocus="Numeric_LostFocus" Margin="20,0,0,0"/>
+                                    <TextBox TextWrapping="Wrap" Text="ml/min" Width="69" Height="18" Margin="3,0,0,0" TextChanged="TextBox_TextChanged" VerticalContentAlignment="Center" BorderThickness="0,0,0,0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Height="35" Margin="0,8,0,0">
+                                    <Button x:Name="btnPump2" Tag="R2" Margin="98,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click" Content="开启注射泵"/>
+                                    <Button x:Name="pumpSet2" Tag="R2" Margin="26,3,3,3" Width="80" Height="25" Click="RateSetButton_Click">流量设定</Button>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0">
+                                    <!-- 在此添加泵B 的控制按钮或状态显示 -->
+                                    <Label Content="流速设定" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
+                                    <TextBox x:Name="textBoxFlowRate2"
+                                     Tag="R2"
+                                     Text="0.000"
+                                     Width="69" Height="18"
+                                     TextAlignment="Right"
+                                     InputMethod.IsInputMethodEnabled="False"
+                                     PreviewTextInput="Numeric_PreviewTextInput"
+                                     PreviewKeyDown="Numeric_PreviewKeyDown"
+                                     LostFocus="Numeric_LostFocus" Margin="20,0,0,0"/>
+                                    <TextBox TextWrapping="Wrap" Text="ml/min" Width="69" Height="18" Margin="3,0,0,0" TextChanged="TextBox_TextChanged" VerticalContentAlignment="Center" BorderThickness="0,0,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="泵C" Grid.Column="4" VerticalAlignment="Top">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Height="30" VerticalAlignment="Center">
+
+                                    <Label Content="泵状态" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="120,0,0,0"/>
+                                    <local:TrafficLightControl Height="32" Width="22" Loaded="TrafficLightControl_Loaded" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="46,0,0,0"/>
+                                </StackPanel>
+                                <!-- 新增：泵C 下方备用 StackPanel -->
+                                <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0" VerticalAlignment="Center">
+                                    <Label Content="流速显示" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
+                                    <TextBox x:Name="RateShow3"
+                                             Tag="R3"
+                                             Text="0.000"
+                                             Width="69" Height="18"
+                                             TextAlignment="Right"
+                                             InputMethod.IsInputMethodEnabled="False"
+                                             PreviewTextInput="Numeric_PreviewTextInput"
+                                             PreviewKeyDown="Numeric_PreviewKeyDown"
+                                             LostFocus="Numeric_LostFocus" TextChanged="textBoxFlowRate_TextChanged" Margin="20,0,0,0"/>
+                                    <TextBox TextWrapping="Wrap" Text="ml/min" Width="69" Height="18" Margin="3,0,0,0" TextChanged="TextBox_TextChanged" VerticalContentAlignment="Center" BorderThickness="0,0,0,0"/>
+                                    <!-- 在此添加泵C 的控制按钮或状态显示 -->
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Height="35" Margin="0,8,0,0">
+                                    <Button x:Name="btnPump3" Tag="R3" Margin="98,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click" Content="开启注射泵"/>
+                                    <Button x:Name="pumpSet3" Tag="R3" Margin="26,3,3,3" Width="80" Height="25" Click="RateSetButton_Click">流量设定</Button>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0" VerticalAlignment="Center">
+                                    <Label Content="流速设定" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
+                                    <TextBox x:Name="textBoxFlowRate3"
+             Tag="R3"
+             Text="0.000"
+             Width="69" Height="18"
+             TextAlignment="Right"
+             InputMethod.IsInputMethodEnabled="False"
+             PreviewTextInput="Numeric_PreviewTextInput"
+             PreviewKeyDown="Numeric_PreviewKeyDown"
+             LostFocus="Numeric_LostFocus" TextChanged="textBoxFlowRate_TextChanged" Margin="20,0,0,0"/>
+                                    <TextBox TextWrapping="Wrap" Text="ml/min" Width="69" Height="18" Margin="3,0,0,0" TextChanged="TextBox_TextChanged" VerticalContentAlignment="Center" BorderThickness="0,0,0,0"/>
+                                    <!-- 在此添加泵C 的控制按钮或状态显示 -->
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                    </Grid>
+
+                    <!-- 底部区域 -->
+                    <Grid Grid.Row="4" Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="代码调试" Grid.Column="0" MinHeight="120">
+                            <Grid Margin="6">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="250"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- 上：接收框（自动换行 + 滚动） -->
+                                <TextBox x:Name="textBoxDebugRecv"
+                                         Grid.Row="0"
+                                         TextWrapping="Wrap"
+                                         AcceptsReturn="True"
+                                         VerticalScrollBarVisibility="Auto"
+                                         HorizontalScrollBarVisibility="Auto"
+                                         IsReadOnly="True"/>
+
+                                <!-- 下：输入框 + 发送键 -->
+                                <Grid Grid.Row="1" Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="8"/>
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBox x:Name="textBoxDebugSend"
+                                             Grid.Column="0"
+                                             Height="20"
+                                             VerticalAlignment="Center"/>
+
+                                    <Button x:Name="btnDebugSend"
+                                            Grid.Column="2"
+                                            Height="25"
+                                            Click="BtnDebugSend_Click">发送</Button>
+                                </Grid>
+                            </Grid>
+                        </GroupBox>
+
+                        <GroupBox Header="TopGroup2" Grid.Column="2" MinHeight="120"/>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <TabItem HorizontalAlignment="Left" Margin="-2,-2,0,0" Width="74">
+                <TabItem.Header>
+                    <StackPanel>
+                        <Label>数据显示</Label>
                     </StackPanel>
                 </TabItem.Header>
                 <Grid Height="642" VerticalAlignment="Top">
@@ -27,76 +258,21 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- 左侧固定宽的串口设置 -->
-                    <GroupBox Header="串口" Grid.Column="0" Width="206" Height="626" VerticalAlignment="Top" Grid.ColumnSpan="3">
+                    <GroupBox Header="数据展示" Grid.Column="0" Width="206" Height="626" VerticalAlignment="Top" Grid.ColumnSpan="3">
                         <StackPanel Height="630" RenderTransformOrigin="0.512,0.800">
                             <StackPanel Orientation="Horizontal">
-                                <Label Margin="3" Height="25" Width="50">端口号</Label>
-                                <ComboBox x:Name="comboBoxCOM" Margin="3" Height="20" Width="130" SelectionChanged="comboBoxCOM_SelectionChanged"/>
+                                <Label Margin="3" Height="25" Width="50">参数1</Label>
+                                <TextBox x:Name="textBoxParam1" Margin="3" Height="20" Width="130" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <Label Margin="3" Height="25" Width="50">波特率</Label>
-                                <ComboBox x:Name="comboBoxBaudRate" Margin="3" Height="20" Width="130" SelectedIndex="3" >
-                                    <ComboBoxItem>9600</ComboBoxItem>
-                                    <ComboBoxItem>19200</ComboBoxItem>
-                                    <ComboBoxItem>38400</ComboBoxItem>
-                                    <ComboBoxItem>115200</ComboBoxItem>
-                                    <ComboBoxItem>1000000</ComboBoxItem>
-                                </ComboBox>
+                                <Label Margin="3" Height="25" Width="50">参数2</Label>
+                                <TextBox x:Name="textBoxParam2" Margin="3" Height="20" Width="130" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <Label Margin="3" Height="25" Width="50">数据位</Label>
-                                <ComboBox x:Name="comboBoxDataBit" Margin="3" Height="20" Width="130" SelectedIndex="3">
-                                    <ComboBoxItem>5</ComboBoxItem>
-                                    <ComboBoxItem>6</ComboBoxItem>
-                                    <ComboBoxItem>7</ComboBoxItem>
-                                    <ComboBoxItem>8</ComboBoxItem>
-                                </ComboBox>
+                                <Label Margin="3" Height="25" Width="50">参数3</Label>
+                                <TextBox x:Name="textBoxParam3" Margin="3" Height="20" Width="130" />
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Margin="3" Height="25" Width="50">停止位</Label>
-                                <ComboBox x:Name="comboBoxStopBit" Margin="3" Height="20" Width="130" SelectedIndex="0">
-                                    <ComboBoxItem>1位</ComboBoxItem>
-                                    <ComboBoxItem>1.5位</ComboBoxItem>
-                                    <ComboBoxItem>2位</ComboBoxItem>
-                                </ComboBox>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Margin="3" Height="25" Width="50">校验位</Label>
-                                <ComboBox x:Name="comboBoxSdd" Margin="3" Height="20" Width="130" SelectedIndex="0">
-                                    <ComboBoxItem>无校验</ComboBoxItem>
-                                    <ComboBoxItem>奇校验</ComboBoxItem>
-                                    <ComboBoxItem>偶校验</ComboBoxItem>
-                                    <ComboBoxItem>1 校验</ComboBoxItem>
-                                    <ComboBoxItem>0 校验</ComboBoxItem>
-                                </ComboBox>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Margin="3" Height="25" Width="50">流控位</Label>
-                                <ComboBox x:Name="comboBoxlik" Margin="3" Height="20" Width="130" SelectedIndex="0" >
-                                    <ComboBoxItem>无流控</ComboBoxItem>
-                                    <ComboBoxItem>RTS/CTS</ComboBoxItem>
-                                    <ComboBoxItem>XON/XOFF</ComboBoxItem>
-                                </ComboBox>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Margin="3" Height="25" Width="50">编码</Label>
-                                <ComboBox x:Name="comboBoxEncoding" Margin="3" Height="20" Width="130" SelectedIndex="0" SelectionChanged="ComboBoxEncoding_SelectionChanged">
-                                    <ComboBoxItem>UTF-8</ComboBoxItem>
-                                    <ComboBoxItem>ASCII</ComboBoxItem>
-                                    <ComboBoxItem>GB2312</ComboBoxItem>
-                                </ComboBox>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button x:Name="btnOpenCloseCom" Margin="3" Width="80" Height="25" Click="BtnOpenCloseCom_Click">打开串口</Button>
-                                <Button x:Name="btnClearRecv" Margin="3" Width="80" Height="25" Click="BtnClearRecv_Click">清空接收</Button>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="61">
-                                <TextBox x:Name="textBoxSend" Width="89" Margin="3" VerticalAlignment="Center" />
-                                <Button x:Name="btnSend" Margin="3" Width="80" Height="25" Click="BtnSend_Click">发送</Button>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <CheckBox x:Name="checkBoxAddCRLF" Margin="3" VerticalAlignment="Center" IsChecked="False">自动添加回车换行</CheckBox>
-                            </StackPanel>
+
 
 
                             <StackPanel Height="3" RenderTransformOrigin="0.5,0.5">
@@ -131,204 +307,6 @@
                         </ScrollViewer>
                     </GroupBox>
                 </Grid>
-            </TabItem>
-            <TabItem HorizontalAlignment="Left" Margin="-2,-2,0,0" Width="74">
-                <TabItem.Header>
-                    <StackPanel>
-                        <Label>泵连接</Label>
-                    </StackPanel>
-                </TabItem.Header>
-
-                <!-- 父容器：改为 Grid（替换原 StackPanel），去掉固定 Height，使用星号行高以随窗口伸缩） -->
-                <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                    <Grid.RowDefinitions>
-                        <!-- 顶部、主体、底部使用星号或固定最小值混合，便于随窗口变化 -->
-                        <RowDefinition Height="Auto" MinHeight="64"/>
-                        <!--  -->
-                        <RowDefinition Height="2*" MinHeight="1"/>
-                        <!-- 可用固定最小高度 -->
-                        <RowDefinition Height="80*"/>
-                        <!-- 主体占剩余空间，随窗口变高/变矮 -->
-                        <RowDefinition Height="2*"/>
-                        <RowDefinition Height="161*"/>
-                        <!-- 可用固定最小高度 -->
-                    </Grid.RowDefinitions>
-
-                    <!-- 顶部区域 -->
-                    <Grid Grid.Row="0" Margin="0,0,0,8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="616*"/>
-                            <ColumnDefinition Width="8*"/>
-                            <ColumnDefinition Width="627*"/>
-                        </Grid.ColumnDefinitions>
-                        <GroupBox Header="仪器连接" Grid.Column="0" MinHeight="30" Margin="0,0,6,0" Grid.ColumnSpan="3"/>
-                        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="3">
-                            <Label Margin="3,10,3,3" Height="25" Width="50" VerticalAlignment="Center">端口号</Label>
-                            <ComboBox x:Name="comboBoxCOM1" Margin="3,10,3,3" Height="20" Width="130" VerticalAlignment="Center" SelectionChanged="comboBoxCOM1_SelectionChanged"/>
-                            <Button x:Name="btnOpenCloseCom1" Margin="3,10,3,3" Width="60" Height="25" Click="BtnOpenCloseCom_Click" VerticalAlignment="Center">打开串口</Button>
-                            <Button x:Name="btnRefreshPorts1" Margin="3,10,3,3" Width="60" Height="25" Click="BtnRefreshPorts_Click" VerticalAlignment="Center">刷新端口</Button>
-                        </StackPanel>
-                        <GroupBox Header="TopGroup2" Grid.Column="2" MinHeight="30"/>
-                    </Grid>
-
-                    <!-- 中间主体：三栏，使用星号列以随宽度伸缩 -->
-                    <Grid Grid.Row="2" Margin="0,9,0,0" Grid.RowSpan="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="8"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="8"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="2"/>
-
-                        <GroupBox Header="泵A" Grid.Column="0" VerticalAlignment="Top" Grid.ColumnSpan="2" Margin="0,0,8,0">
-                            <StackPanel>
-                                <StackPanel x:Name="stackPanel" Tag="R1" Orientation="Horizontal" Height="30" VerticalAlignment="Center">
-
-                                    <Label Content="泵状态" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
-                                    <local:TrafficLightControl Height="32" Width="22" Grid.IsSharedSizeScope="True" Margin="46,0,0,0"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0">
-
-                                    <Label Content="流速显示" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
-                                    <TextBox x:Name="RateShow1"
-                                             Tag="R1"
-                                             Text="0.000"
-                                             Width="69" Height="18"
-                                             TextAlignment="Right"
-                                             InputMethod.IsInputMethodEnabled="False"
-                                             PreviewTextInput="Numeric_PreviewTextInput"
-                                             PreviewKeyDown="Numeric_PreviewKeyDown"
-                                             LostFocus="Numeric_LostFocus" TextChanged="textBoxFlowRate_TextChanged" Margin="20,0,0,0"/>
-                                    <!-- 在此添加泵A 的控制按钮或状态显示 -->
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="35" Margin="0,8,0,0">
-                                    <Button x:Name="btnPump1" Tag="R1" Margin="98,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click" Content="开启注射泵"/>
-                                    <Button x:Name="pumpSet1" Tag="R1" Margin="26,3,3,3" Width="80" Height="25" Click="RateSetButton_Click">流量设定</Button>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0">
-
-                                    <Label Content="流速设定" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
-                                    <TextBox x:Name="textBoxFlowRate1"
-             Tag="R1"
-             Text="0.000"
-             Width="69" Height="18"
-             TextAlignment="Right"
-             InputMethod.IsInputMethodEnabled="False"
-             PreviewTextInput="Numeric_PreviewTextInput"
-             PreviewKeyDown="Numeric_PreviewKeyDown"
-             LostFocus="Numeric_LostFocus" TextChanged="textBoxFlowRate_TextChanged" Margin="20,0,0,0"/>
-                                    <!-- 在此添加泵A 的控制按钮或状态显示 -->
-                                </StackPanel>
-                            </StackPanel>
-                        </GroupBox>
-
-                        <GroupBox Header="泵B" Grid.Column="2" VerticalAlignment="Top">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="30" VerticalAlignment="Center" HorizontalAlignment="Left">
-
-                                    <Label Content="泵状态" Width="67" HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
-                                    <local:TrafficLightControl Height="32" Width="22" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="46,0,0,0"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0">
-                                    <!-- 在此添加泵B 的控制按钮或状态显示 -->
-                                    <Label Content="流速显示" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
-                                    <TextBox x:Name="RateShow2"
-                                             Tag="R2"
-                                             Text="0.000"
-                                             Width="69" Height="18"
-                                             TextAlignment="Right"
-                                             InputMethod.IsInputMethodEnabled="False"
-                                             PreviewTextInput="Numeric_PreviewTextInput"
-                                             PreviewKeyDown="Numeric_PreviewKeyDown"
-                                             LostFocus="Numeric_LostFocus" Margin="20,0,0,0"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="35" Margin="0,8,0,0">
-                                    <Button x:Name="btnPump2" Tag="R2" Margin="98,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click" Content="开启注射泵"/>
-                                    <Button x:Name="pumpSet2" Tag="R2" Margin="26,3,3,3" Width="80" Height="25" Click="RateSetButton_Click">流量设定</Button>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0">
-                                    <!-- 在此添加泵B 的控制按钮或状态显示 -->
-                                    <Label Content="流速设定" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
-                                    <TextBox x:Name="textBoxFlowRate2"
-             Tag="R2"
-             Text="0.000"
-             Width="69" Height="18"
-             TextAlignment="Right"
-             InputMethod.IsInputMethodEnabled="False"
-             PreviewTextInput="Numeric_PreviewTextInput"
-             PreviewKeyDown="Numeric_PreviewKeyDown"
-             LostFocus="Numeric_LostFocus" Margin="20,0,0,0"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </GroupBox>
-
-                        <GroupBox Header="泵C" Grid.Column="4" VerticalAlignment="Top">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="30" VerticalAlignment="Center">
-
-                                    <Label Content="泵状态" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="120,0,0,0"/>
-                                    <local:TrafficLightControl Height="32" Width="22" Loaded="TrafficLightControl_Loaded" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="46,0,0,0"/>
-                                </StackPanel>
-                                <!-- 新增：泵C 下方备用 StackPanel -->
-                                <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0" VerticalAlignment="Center">
-                                    <Label Content="流速显示" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
-                                    <TextBox x:Name="RateShow3"
-                                             Tag="R3"
-                                             Text="0.000"
-                                             Width="69" Height="18"
-                                             TextAlignment="Right"
-                                             InputMethod.IsInputMethodEnabled="False"
-                                             PreviewTextInput="Numeric_PreviewTextInput"
-                                             PreviewKeyDown="Numeric_PreviewKeyDown"
-                                             LostFocus="Numeric_LostFocus" TextChanged="textBoxFlowRate_TextChanged" Margin="20,0,0,0"/>
-                                    <!-- 在此添加泵C 的控制按钮或状态显示 -->
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="35" Margin="0,8,0,0">
-                                    <Button x:Name="btnPump3" Tag="R3" Margin="98,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click" Content="开启注射泵"/>
-                                    <Button x:Name="pumpSet3" Tag="R3" Margin="26,3,3,3" Width="80" Height="25" Click="RateSetButton_Click">流量设定</Button>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0" VerticalAlignment="Center">
-                                    <Label Content="流速设定" Width="67" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="120,0,0,0"/>
-                                    <TextBox x:Name="textBoxFlowRate3"
-             Tag="R3"
-             Text="0.000"
-             Width="69" Height="18"
-             TextAlignment="Right"
-             InputMethod.IsInputMethodEnabled="False"
-             PreviewTextInput="Numeric_PreviewTextInput"
-             PreviewKeyDown="Numeric_PreviewKeyDown"
-             LostFocus="Numeric_LostFocus" TextChanged="textBoxFlowRate_TextChanged" Margin="20,0,0,0"/>
-                                    <!-- 在此添加泵C 的控制按钮或状态显示 -->
-                                </StackPanel>
-                            </StackPanel>
-                        </GroupBox>
-                    </Grid>
-
-                    <!-- 底部区域 -->
-                    <Grid Grid.Row="4" Margin="0,8,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="8"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <GroupBox Header="TopGroup1" Grid.Column="0" MinHeight="120"/>
-                        <GroupBox Header="TopGroup2" Grid.Column="2" MinHeight="120"/>
-                    </Grid>
-                </Grid>
-            </TabItem>
-            <TabItem HorizontalAlignment="Left" Margin="-2,-2,0,0" Width="74">
-                <TabItem.Header>
-                    <StackPanel>
-                        <Label>数据显示</Label>
-                    </StackPanel>
-                </TabItem.Header>
-                <StackPanel >
-                    <GroupBox Height="384" Header="GroupBox" Width="475"/>
-                </StackPanel>
-
             </TabItem>
         </TabControl>
         <Image Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="100" Margin="-82,492,0,0" VerticalAlignment="Top" Width="100"/>

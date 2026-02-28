@@ -35,7 +35,7 @@
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label Margin="3" Height="25" Width="50">波特率</Label>
-                                <ComboBox x:Name="comboBoxBaudRate" Margin="3" Height="20" Width="130" SelectedIndex="0" >
+                                <ComboBox x:Name="comboBoxBaudRate" Margin="3" Height="20" Width="130" SelectedIndex="3" >
                                     <ComboBoxItem>9600</ComboBoxItem>
                                     <ComboBoxItem>19200</ComboBoxItem>
                                     <ComboBoxItem>38400</ComboBoxItem>
@@ -205,7 +205,7 @@
                                     <!-- 在此添加泵A 的控制按钮或状态显示 -->
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Height="35" Margin="0,8,0,0">
-                                    <Button x:Name="btnPump1" Tag="R1" Margin="98,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click">打开泵</Button>
+                                    <Button x:Name="btnPump1" Tag="R1" Margin="98,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click" Content="开启注射泵"/>
                                     <Button x:Name="pumpSet1" Tag="R1" Margin="26,3,3,3" Width="80" Height="25" Click="RateSetButton_Click">流量设定</Button>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0">
@@ -246,7 +246,7 @@
                                              LostFocus="Numeric_LostFocus" Margin="20,0,0,0"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Height="35" Margin="0,8,0,0">
-                                    <Button x:Name="btnPump2" Tag="R2" Margin="98,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click">打开泵</Button>
+                                    <Button x:Name="btnPump2" Tag="R2" Margin="98,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click" Content="开启注射泵"/>
                                     <Button x:Name="pumpSet2" Tag="R2" Margin="26,3,3,3" Width="80" Height="25" Click="RateSetButton_Click">流量设定</Button>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0">
@@ -287,7 +287,7 @@
                                     <!-- 在此添加泵C 的控制按钮或状态显示 -->
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Height="35" Margin="0,8,0,0">
-                                    <Button x:Name="btnPump3" Tag="R3" Margin="98,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click">打开泵</Button>
+                                    <Button x:Name="btnPump3" Tag="R3" Margin="98,3,3,3" Width="80" Height="25" Click="pumpOpenClose_Click" Content="开启注射泵"/>
                                     <Button x:Name="pumpSet3" Tag="R3" Margin="26,3,3,3" Width="80" Height="25" Click="RateSetButton_Click">流量设定</Button>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Height="30" Margin="0,8,0,0" VerticalAlignment="Center">

@@ -202,29 +202,36 @@ namespace IPC
             string pumpOpen = "P1,G1,1";
             string pumpClose = "P1,G1,0";
 
+            add = add + ",";
+
             pumpOpen = add + pumpOpen;
             pumpClose = add + pumpClose;
 
-            int pumpState = 0; // 0: 关闭, 1: 开启
-
-            if (pumpState == 1)
+            if (sender is not Button btn)
             {
-                _spManager.SendString(pumpClose);
-                await Task.Delay(1000); // 延时1秒（非阻塞）
-                btnOpenCloseCom.Content = "泵关闭";
-                pumpState = 0;
+                MessageBox.Show("无法识别泵按钮", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
-            else if (pumpState == 0)
+
+            string btnText = btn.Content?.ToString() ?? string.Empty;
+            string commandToSend;
+
+            if (btnText.Contains("关闭"))
             {
-                _spManager.SendString(pumpOpen);
-                btnOpenCloseCom.Content = "泵开启";
-                pumpState = 1;
+                commandToSend = pumpClose;
+                btn.Content = "开启注射泵";
+            }
+            else
+            {
+                commandToSend = pumpOpen;
+                btn.Content = "关闭注射泵";
             }
 
             try
             {
-                _spManager.SendString(pumpOpen);
-                Debug.WriteLine("已发送: " + pumpOpen);
+                _spManager.SendString(commandToSend);
+                await Task.Delay(1000); // 延时1秒（非阻塞）
+                Debug.WriteLine("已发送: " + commandToSend);
             }
             catch (Exception ex)
             {
